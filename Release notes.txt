@@ -1,0 +1,31 @@
+OpenCms Module Developer Eclipse plug-in
+
+todo for release 0.0.1:
+- create opencms library container
+- update library when preferences change
+- TEST WITH OPENCMS 6.0.4, 6.2.3 AND 7RC2
+- TEST WITH TOMCAT PLUGIN
+
+
+Release 0.0.1 -- released on June 17, 2007
+- New OpenCms Module wizard with import possibility of module from server -- done
+- Toggle OpenCms module nature -- done
+- Upload module to OpenCms -- done
+- Upload and Publish module to OpenCms -- done
+- Download module from OpenCms -- done
+- Use local OpenCms installation codebase (via Custom ClassLoader) -- done
+- Change OpenCms classpath without restarting eclipse -- done
+- Maintain preferences -- done
+
+Wishlist - for later releases
+- write unit- and integrationtests and make plugin more robust
+- Show progressbar when connecting to OpenCms
+- Maintain OpenCms file properties in eclipse
+- Maintain other module info, such as exportpoints etc.
+- Connect/Disconnect with OpenCms from preferences page
+- Add source location to preferences which will be used when constructing OpenCms library
+- Refine error mechanism and user messages
+- Support of XmlContent en XmlContent schema validation and code completion (very low priority due to expected complications)
+- Create module zip file from eclipse
+- Diff with server
+- Merge module between server/eclipse
