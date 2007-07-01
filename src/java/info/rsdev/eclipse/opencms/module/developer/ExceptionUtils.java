@@ -30,16 +30,45 @@ public class ExceptionUtils {
 		if (t instanceof CoreException) {
 			ce = (CoreException)t;
 		} else {
+			//turn the Throwable in a IStatus-object
 			IStatus status = transform(t);
+			
+			//But if the Throwable has one or more causes, I want to show the root cause,
+			//since these are normally the most descriptive
+			if (hasCause(t)) {
+				Throwable cause = getRootCause(t);
+				String rootMessage = cause.toString();
+				
+				//set rootMessage as the message of the status-object
+				status = setMessage(status, rootMessage);
+			}
+			
 			ce = new CoreException(status);
 		}
 		
+		//TODO: show message of root exception
 		//log message to logfile
 		OpenCmsModuleDeveloperPlugin.getDefault().getLog().log(ce.getStatus());
 		
 		throw ce;
 	}
 	
+	private static IStatus setMessage(IStatus status, String rootMessage) {
+		Throwable t = status.getException();
+		int code = status.getCode();
+		int severity = status.getSeverity();
+		String pluginId = status.getPlugin();
+		IStatus[] children = status.getChildren();
+		IStatus newStatus = null;
+		if (status.isMultiStatus()) {
+			newStatus = new MultiStatus(pluginId, code, children, rootMessage, t);
+		} else {
+			newStatus = new Status(severity, pluginId, code, rootMessage, t);
+		}
+		
+		return newStatus;
+	}
+
 	public static void throwCoreException(String message) throws CoreException {
 		IStatus status = new Status(IStatus.ERROR, OpenCmsModuleDeveloperPlugin.PLUGIN_ID, -1, message, null);
 		throw new CoreException(status);
