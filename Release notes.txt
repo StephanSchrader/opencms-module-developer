@@ -1,11 +1,8 @@
 OpenCms Module Developer Eclipse plug-in
 
-todo for release 0.0.1:
-- create opencms library container
-- update library when preferences change
-- TEST WITH OPENCMS 6.0.4, 6.2.3 AND 7RC2
-- TEST WITH TOMCAT PLUGIN
-
+Release 0.0.2 -- released on July 2, 2007
+- Log exceptions to Eclipse log file
+- Make small change to the way the plugin connects to OpenCms. This resolves the 'unresolved compilation error'. 
 
 Release 0.0.1 -- released on June 17, 2007
 - New OpenCms Module wizard with import possibility of module from server -- done
