@@ -166,11 +166,11 @@ public class NewModuleWizard extends Wizard implements INewWizard {
 		ICommunicator communicator = null;
 		try {
 			if (CommunicatorUtils.isProperlyConfigured()) {
-				communicator = CommunicatorUtils.getCommunicator();
+				communicator = CommunicatorUtils.getCommunicator(null);
 				if (descriptor.isImportModule()) {
-					communicator.getFromServer(project);
+					communicator.getFromServer(project, null);
 				} else {
-					communicator.createModule(descriptor);
+					communicator.createModule(descriptor, null);
 				}
 			}
 		} catch (CoreException ce) {

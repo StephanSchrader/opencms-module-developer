@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * @author Dave Schoorl
@@ -25,14 +26,14 @@ public interface ICommunicator {
 
 	public void close();
 	
-	public void createModule(OpenCmsModuleDescriptor descriptor) throws CoreException;
+	public void createModule(OpenCmsModuleDescriptor descriptor, IProgressMonitor progressMonitor) throws CoreException;
 
-	public void getFromServer(IProject javaProject) throws CoreException;
+	public void getFromServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException;
 	
-	public void copyToServer(IProject javaProject) throws CoreException;
+	public void copyToServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException;
 
-	public void publish(IProject javaProject) throws CoreException;
+	public void publish(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException;
 
-	public List getModules() throws CoreException;
+	public List getModules(IProgressMonitor progressMonitor) throws CoreException;
 
 }

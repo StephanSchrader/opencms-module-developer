@@ -1,5 +1,8 @@
 OpenCms Module Developer Eclipse plug-in
 
+Release 0.0.3 -- to be released
+- Show progressbar when communicating with OpenCms
+
 Release 0.0.2 -- released on July 2, 2007
 - Log exceptions to Eclipse log file
 - Make small change to the way the plugin connects to OpenCms. This resolves the 'unresolved compilation error'. 
@@ -16,7 +19,6 @@ Release 0.0.1 -- released on June 17, 2007
 
 Wishlist - for later releases
 - write unit- and integrationtests and make plugin more robust
-- Show progressbar when connecting to OpenCms
 - Maintain OpenCms file properties in eclipse
 - Maintain other module info, such as exportpoints etc.
 - Connect/Disconnect with OpenCms from preferences page

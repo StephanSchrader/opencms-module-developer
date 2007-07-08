@@ -10,12 +10,9 @@
  */
 package info.rsdev.eclipse.opencms.module.developer.actions;
 
-import java.util.Iterator;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.opencms.main.ICommunicator;
 
 /**
@@ -24,19 +21,9 @@ import org.opencms.main.ICommunicator;
  */
 public class UploadAndPublishAction extends AbstractOpenCmsCommunicationAction {
 
-	public void execute(IAction action, ICommunicator communicator) throws CoreException {
-		
-		if (selection instanceof StructuredSelection) {
-			StructuredSelection structuredSelection = (StructuredSelection)selection;
-			Iterator iterator = structuredSelection.iterator();
-			while (iterator.hasNext()) {
-				Object selectedItem = iterator.next();
-				if (selectedItem instanceof IProject) {
-					communicator.copyToServer((IProject)selectedItem);
-					communicator.publish((IProject)selectedItem);
-				}
-			}
-		}
+	public void execute(IProject project, ICommunicator communicator, IProgressMonitor progressMonitor) throws CoreException {
+		communicator.copyToServer(project, progressMonitor);
+		communicator.publish(project, progressMonitor);
 	}
 
 }

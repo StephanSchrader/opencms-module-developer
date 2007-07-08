@@ -54,6 +54,13 @@ public class Messages extends NLS {
 	public static String wizard_label_fetchmodules;
 	public static String wizard_tooltip_fetchmodules;
 	
+	public static String task_establish_connection;
+	public static String task_start_opencms;
+	public static String task_configure_opencms;
+	public static String task_initialize_opencms;
+	public static String task_login_opencms;
+	public static String task_shutdown_opencms;
+	
 	public static String opencms_library_name;
 	public static String copy_finished;
 	public static String get_finished;

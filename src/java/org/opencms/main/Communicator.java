@@ -38,7 +38,10 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.swt.widgets.Display;
 import org.opencms.configuration.CmsSystemConfiguration;
 import org.opencms.file.CmsFile;
 import org.opencms.file.CmsFolder;
@@ -81,52 +84,89 @@ public class Communicator implements ICommunicator {
 	 * connect to OpenCms outside a web container.
 	 * 
 	 */
-	private Communicator() throws CoreException {
-		Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
-		String webinfLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
-		String servletMapping = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SERVLET_MAPPING);
-		String webappName = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBAPP_NAME);
-		String userName = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_USERNAME);
-		String password = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_PASSWORD);
-		OpenCmsCore opencms = null;
-		
+	private Communicator(final IProgressMonitor progressMonitor) throws CoreException {
+		progressMonitor.beginTask(Messages.task_start_opencms, 5000);
 		try {
-			opencms = OpenCmsCore.getInstance();
-			opencms.getSystemInfo().init(webinfLocation, servletMapping, null, webappName);
-			ExtendedProperties configuration = null;
-			String propertyPath = opencms.getSystemInfo().getConfigurationFileRfsPath();
-			configuration = CmsPropertyUtils.loadProperties(propertyPath);
-			opencms = opencms.upgradeRunlevel(configuration);
-		} catch (Exception t) {
-			if (opencms != null) {
-				opencms.shutDown();
+			Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
+			String webinfLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
+			String servletMapping = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SERVLET_MAPPING);
+			String webappName = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBAPP_NAME);
+			String userName = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_USERNAME);
+			String password = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_PASSWORD);
+			OpenCmsCore opencms = null;
+			
+			try {
+				progressMonitor.subTask(Messages.task_configure_opencms);
+				opencms = OpenCmsCore.getInstance();
+				opencms.getSystemInfo().init(webinfLocation, servletMapping, null, webappName);
+				ExtendedProperties configuration = null;
+				String propertyPath = opencms.getSystemInfo().getConfigurationFileRfsPath();
+				configuration = CmsPropertyUtils.loadProperties(propertyPath);
+				progressMonitor.worked(500);
+				
+				//Start a timer task that updates the progressMonitor during the following long running operation
+				progressMonitor.subTask(Messages.task_initialize_opencms);
+				
+//				Thread progressBarUpdateThread = new Thread(new Runnable() {
+//					
+//					private boolean initializationInProgress = true;
+//
+//					public void run() {
+//						try {
+//							while(initializationInProgress) {
+//								Display.getDefault().asyncExec(new Runnable() {
+//						               public void run() {
+//						            	   progressMonitor.worked(50);
+//						               }
+//						            });
+//								this.wait(500);
+//							}
+//						} catch (InterruptedException e) {
+//							initializationInProgress = false;
+//						}
+//					}
+//					
+//				});
+//				progressBarUpdateThread.start();
+				opencms = opencms.upgradeRunlevel(configuration);	//this is a longrunning operation when connection to OpenCms does noet yet exist
+				progressMonitor.worked(4000);
+				//Stop the timer task. The longrunning operation has finished
+//				progressBarUpdateThread.interrupt();
+	
+			} catch (Exception t) {
+				if (opencms != null) {
+					opencms.shutDown();
+				}
+				OpenCmsClassLoader.markInvalid();
+				ExceptionUtils.throwCoreException(t);
 			}
-			OpenCmsClassLoader.markInvalid();
-			ExceptionUtils.throwCoreException(t);
-		}
-		
-		CmsProject project = null;
-		try {
-            this.cmso = opencms.initCmsObject(opencms.getDefaultUsers().getUserGuest());
-            this.cmso.loginUser(userName, password);
-
-			project = this.cmso.readProject(PROJECT);
-		} catch(Throwable t) {
-			if (opencms != null) {
-				close();
+			
+			CmsProject project = null;
+			try {
+				progressMonitor.subTask(Messages.task_login_opencms);
+	            this.cmso = opencms.initCmsObject(opencms.getDefaultUsers().getUserGuest());
+	            this.cmso.loginUser(userName, password);
+				project = this.cmso.readProject(PROJECT);
+				progressMonitor.worked(500);
+			} catch(Throwable t) {
+				if (opencms != null) {
+					close();
+				}
+				ExceptionUtils.throwCoreException(t);
 			}
-			ExceptionUtils.throwCoreException(t);
+	        this.cmso.getRequestContext().setCurrentProject(project);
+	        
+	        //List configs = opencms.getConfigurationManager().getConfigurations();
+	        CmsSystemConfiguration systemConfig = (CmsSystemConfiguration)opencms.getConfigurationManager().getConfiguration(CmsSystemConfiguration.class);
+	        OPENCMS_ENCODING = systemConfig.getDefaultContentEncoding();
+		} finally {
+			progressMonitor.done();
 		}
-        this.cmso.getRequestContext().setCurrentProject(project);
-        
-        //List configs = opencms.getConfigurationManager().getConfigurations();
-        CmsSystemConfiguration systemConfig = (CmsSystemConfiguration)opencms.getConfigurationManager().getConfiguration(CmsSystemConfiguration.class);
-        OPENCMS_ENCODING = systemConfig.getDefaultContentEncoding();
 	}
 
-	public static ICommunicator getInstance() throws CoreException {
+	public static ICommunicator getInstance(IProgressMonitor progressMonitor) throws CoreException {
 		if (instance == null) {
-			instance = new Communicator();
+			instance = new Communicator(new SubProgressMonitor(progressMonitor, 5000));
 		}
 		return instance;
 	}
@@ -145,7 +185,7 @@ public class Communicator implements ICommunicator {
         this.cmso = null;
 	}
 	
-	public List getModules() throws CoreException {
+	public List getModules(IProgressMonitor progressMonitor) throws CoreException {
 		//Retrieve a list of installed modules
 		List installedModules = null;
 		if (installedModules == null) {
@@ -175,7 +215,7 @@ public class Communicator implements ICommunicator {
 		return installedModulesWithResources;
 	}
 	
-	public void createModule(OpenCmsModuleDescriptor descriptor) throws CoreException {
+	public void createModule(OpenCmsModuleDescriptor descriptor, IProgressMonitor progressMonitor) throws CoreException {
 		if ((descriptor == null) || (descriptor.getModuleName() == null)) {
 			return;
 		}
@@ -210,7 +250,7 @@ public class Communicator implements ICommunicator {
 	/* (non-Javadoc)
 	 * @see org.opencms.main.ICommunicator#copyToServer(org.eclipse.jdt.core.IJavaProject)
 	 */
-	public void copyToServer(IProject javaProject) throws CoreException {
+	public void copyToServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
 		CmsObject cms = getCmsObject();
 		if (cms != null) {
 			try {
@@ -247,7 +287,7 @@ public class Communicator implements ICommunicator {
 	/* (non-Javadoc)
 	 * @see org.opencms.main.ICommunicator#getFromServer(org.eclipse.jdt.core.IJavaProject)
 	 */
-	public void getFromServer(IProject javaProject) throws CoreException {
+	public void getFromServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
 		CmsObject cms = getCmsObject();
 		if (cms != null) {
 			try {
@@ -277,7 +317,7 @@ public class Communicator implements ICommunicator {
 		}
 	}
 
-	public void publish(IProject javaProject) throws CoreException {
+	public void publish(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
 		//throw new UnsupportedOperationException("Publishing is not yet implemented");
 		CmsObject cms = getCmsObject();
 		if (cms != null) {
@@ -367,7 +407,7 @@ public class Communicator implements ICommunicator {
 		String moduleName = descriptor.getModuleName();
 		if (!moduleManager.hasModule(moduleName)) {
 			if (create) {
-				createModule(descriptor);
+				createModule(descriptor, null);
 			} else {
 				ExceptionUtils.throwCoreException(Messages.exception_no_such_module + moduleName);
 			}

@@ -10,13 +10,20 @@
  */
 package info.rsdev.eclipse.opencms.module.developer.actions;
 
+import java.util.Iterator;
+
 import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
@@ -36,22 +43,58 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	public final void run(IAction action) {
-		ICommunicator communicator = null;
+	public final void run(final IAction action) {
 		try {
-			if (CommunicatorUtils.isProperlyConfigured()) {
-				communicator = CommunicatorUtils.getCommunicator();
-				execute(action, communicator);
-				showOperationFinishedMessage();
+			if ((selection instanceof StructuredSelection) && (CommunicatorUtils.isProperlyConfigured())) {
+				ProgressMonitorDialog monitorDialog = new ProgressMonitorDialog(shell);
+				try {
+					monitorDialog.run(true, true, new IRunnableWithProgress() {
+						
+						ICommunicator communicator = null;
+						
+						public void run(IProgressMonitor progressMonitor) {
+							/* Setup the progress monitor: 5000 units of work for connecting to OpenCms
+							 * and 1000 units of work for each project
+							 */
+							StructuredSelection structuredSelection = (StructuredSelection)selection;
+							int numberOfSelectedProjects = structuredSelection.size();
+							progressMonitor.beginTask(action.getDescription(), 5000+1000*numberOfSelectedProjects);
+							try {
+								communicator = CommunicatorUtils.getCommunicator(progressMonitor);
+								progressMonitor.worked(5000);
+								
+								/* iterate over the selected projects and execute the action of the subclass 
+								 * implementeation on each project
+								 */
+								Iterator iterator = structuredSelection.iterator();
+								while (iterator.hasNext()) {
+									Object selectedItem = iterator.next();
+									if (selectedItem instanceof IProject) {
+										execute((IProject)selectedItem, communicator, progressMonitor);
+									}
+									progressMonitor.worked(1000);
+								}
+							} catch (CoreException t) {
+								ExceptionUtils.showErrorDialog(t, shell);
+							} finally {
+								CommunicatorUtils.close(communicator, false);
+								progressMonitor.done();
+							}
+						}
+					});
+				} catch (InterruptedException ie) {
+					//Cancelled by user -- do nothing for now (in future, reverse action?? -- how
+					ie.printStackTrace();
+				} catch (Exception e) {
+					ExceptionUtils.throwCoreException(e);
+				}
 			}
 		} catch (CoreException t) {
 			ExceptionUtils.showErrorDialog(t, shell);
-		} finally {
-			CommunicatorUtils.close(communicator, false);
 		}
 	}
 	
-	public abstract void execute(IAction action, ICommunicator communicator) throws CoreException ;
+	public abstract void execute(IProject project, ICommunicator communicator, IProgressMonitor progressMonitor) throws CoreException ;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)

@@ -175,8 +175,8 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 					ICommunicator communicator = null;
 					try {
 						if (CommunicatorUtils.isProperlyConfigured()) {
-							communicator = CommunicatorUtils.getCommunicator();
-							List moduleNames = communicator.getModules();
+							communicator = CommunicatorUtils.getCommunicator(null);
+							List moduleNames = communicator.getModules(null);
 							if (moduleNames.size() > 0) {
 								moduleNameCombo.setItems((String[])moduleNames.toArray(new String[moduleNames.size()]));
 								if ((moduleName == null) || (moduleName.trim().length() == 0)) {
@@ -329,8 +329,8 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 		ICommunicator communicator = null;
 		try {
 			if (CommunicatorUtils.isProperlyConfigured()) {
-				communicator = CommunicatorUtils.getCommunicator();
-				moduleNames = communicator.getModules();
+				communicator = CommunicatorUtils.getCommunicator(null);
+				moduleNames = communicator.getModules(null);
 			}
 		} catch (CoreException ce) {
 			ExceptionUtils.showErrorDialog(ce, getShell());

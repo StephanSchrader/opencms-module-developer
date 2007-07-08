@@ -10,18 +10,19 @@
  */
 package org.opencms.main;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 import info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleDeveloperPlugin;
 import info.rsdev.eclipse.opencms.module.developer.loader.OpenCmsClassLoader;
 import info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsModuleDeveloperPreferencePage;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
@@ -34,16 +35,16 @@ public class CommunicatorUtils {
 	
 	private CommunicatorUtils() {}
 	
-	public static ICommunicator getCommunicator() throws CoreException {
+	public static ICommunicator getCommunicator(IProgressMonitor progressMonitor) throws CoreException {
 		Thread currentThread = Thread.currentThread();
 		ClassLoader oldLoader = currentThread.getContextClassLoader();
-		ClassLoader newLoader = OpenCmsClassLoader.getInstance();
-		currentThread.setContextClassLoader(newLoader);
+		ClassLoader openCmsLoader = OpenCmsClassLoader.getInstance();
+		currentThread.setContextClassLoader(openCmsLoader);
 		ICommunicator communicator = null;
 		try {
-			Class communicatorClass = Class.forName("org.opencms.main.Communicator", false, newLoader);
-			Method instantiater = communicatorClass.getMethod("getInstance", new Class[] {});
-			communicator = (ICommunicator)instantiater.invoke(communicatorClass, new Object[]{});
+			Class communicatorClass = Class.forName("org.opencms.main.Communicator", false, openCmsLoader);
+			Method instantiater = communicatorClass.getMethod("getInstance", new Class[] { IProgressMonitor.class });
+			communicator = (ICommunicator)instantiater.invoke(communicatorClass, new Object[]{ progressMonitor });
 		} catch (Throwable t) {
 			ExceptionUtils.throwCoreException(t);
 			close(communicator, true);
