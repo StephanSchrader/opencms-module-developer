@@ -14,6 +14,7 @@ import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,9 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -35,6 +39,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.opencms.main.CommunicatorUtils;
 import org.opencms.main.ICommunicator;
@@ -171,26 +176,58 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 		    fetchModulesButton.setToolTipText(Messages.wizard_tooltip_fetchmodules);
 		    fetchModulesButton.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
+					final List moduleNames = new ArrayList();
 					String moduleName = moduleNameCombo.getText();
 					ICommunicator communicator = null;
 					try {
 						if (CommunicatorUtils.isProperlyConfigured()) {
-							communicator = CommunicatorUtils.getCommunicator(null);
-							List moduleNames = communicator.getModules(null);
-							if (moduleNames.size() > 0) {
-								moduleNameCombo.setItems((String[])moduleNames.toArray(new String[moduleNames.size()]));
-								if ((moduleName == null) || (moduleName.trim().length() == 0)) {
-									moduleNameCombo.select(0);
-								} else {
-									moduleNameCombo.setText(moduleName);
-								}
-								
+							final Shell shell = getShell();
+							ProgressMonitorDialog monitorDialog = new ProgressMonitorDialog(shell);
+							try {
+								monitorDialog.run(true, true, new IRunnableWithProgress() {
+									
+									ICommunicator communicator = null;
+									
+									public void run(IProgressMonitor progressMonitor) {
+										
+										/* Setup the progress monitor: 5000 units of work for connecting to OpenCms
+										 * and 1000 units of work for fetching the modules
+										 */
+										progressMonitor.beginTask(Messages.task_fetch_modules, 5000+1000);
+										try {
+											communicator = CommunicatorUtils.getCommunicator(progressMonitor);
+											progressMonitor.worked(5000);
+											
+											moduleNames.addAll(communicator.getModules(progressMonitor));
+											progressMonitor.worked(1000);
+										} catch (CoreException t) {
+											ExceptionUtils.showErrorDialog(t, shell);
+										} finally {
+											CommunicatorUtils.close(communicator, false);
+											progressMonitor.done();
+										}
+									}
+								});
+							} catch (InterruptedException ie) {
+								//Cancelled by user -- do nothing for now (in future, reverse action?? -- how
+								ie.printStackTrace();
+							} catch (Exception e) {
+								ExceptionUtils.throwCoreException(e);
 							}
 						}
 					} catch (CoreException ce) {
 						ExceptionUtils.showErrorDialog(ce, getShell());
 					} finally {
 						CommunicatorUtils.close(communicator, false);
+					}
+					
+					if (moduleNames.size() > 0) {
+						moduleNameCombo.setItems((String[])moduleNames.toArray(new String[moduleNames.size()]));
+						if ((moduleName == null) || (moduleName.trim().length() == 0)) {
+							moduleNameCombo.select(0);
+						} else {
+							moduleNameCombo.setText(moduleName);
+						}
 					}
 				}
 		    });

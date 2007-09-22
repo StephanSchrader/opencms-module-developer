@@ -2,6 +2,7 @@ OpenCms Module Developer Eclipse plug-in
 
 Release 0.0.3 -- to be released
 - Show progressbar when communicating with OpenCms
+- fixed bug 1767941 that occured on Linux based systems
 
 Release 0.0.2 -- released on July 2, 2007
 - Log exceptions to Eclipse log file

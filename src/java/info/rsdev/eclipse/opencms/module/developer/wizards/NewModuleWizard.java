@@ -118,8 +118,8 @@ public class NewModuleWizard extends Wizard implements INewWizard {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root= workspace.getRoot();
 		IProject project= root.getProject(moduleName);
-		project.create(null);
-		project.open(null);
+		project.create(monitor);
+		project.open(monitor);
 		
 		//Set project natures
 		IProjectDescription projectDescription = project.getDescription();
@@ -166,11 +166,11 @@ public class NewModuleWizard extends Wizard implements INewWizard {
 		ICommunicator communicator = null;
 		try {
 			if (CommunicatorUtils.isProperlyConfigured()) {
-				communicator = CommunicatorUtils.getCommunicator(null);
+				communicator = CommunicatorUtils.getCommunicator(monitor);
 				if (descriptor.isImportModule()) {
-					communicator.getFromServer(project, null);
+					communicator.getFromServer(project, monitor);
 				} else {
-					communicator.createModule(descriptor, null);
+					communicator.createModule(descriptor, monitor);
 				}
 			}
 		} catch (CoreException ce) {

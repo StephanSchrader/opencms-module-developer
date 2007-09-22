@@ -60,6 +60,8 @@ public class Messages extends NLS {
 	public static String task_initialize_opencms;
 	public static String task_login_opencms;
 	public static String task_shutdown_opencms;
+	public static String task_fetch_modules;
+	
 	
 	public static String opencms_library_name;
 	public static String copy_finished;
@@ -73,7 +75,7 @@ public class Messages extends NLS {
 	public static String exception_project_already_exist;
 	public static String exception_no_such_module;
 	public static String exception_unsupported_file_type;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
