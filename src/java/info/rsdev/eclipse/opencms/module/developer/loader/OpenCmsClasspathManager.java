@@ -193,6 +193,9 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 				try {
 					String fullFileName = file.getAbsolutePath();
 					fullFileName.replaceAll("\\\\", "/");
+					if (fullFileName.startsWith("/")) {
+						fullFileName = fullFileName.substring(1);	//Strip leading slashes for filename
+					}
 					resourceURL = new URL("jar:file:/"+fullFileName+"!/"+resourceName);
 				} catch (MalformedURLException e) {
 					e.printStackTrace(System.out);
