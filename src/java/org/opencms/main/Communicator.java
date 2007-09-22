@@ -42,7 +42,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.swt.widgets.Display;
 import org.opencms.configuration.CmsSystemConfiguration;
 import org.opencms.file.CmsFile;
 import org.opencms.file.CmsFolder;
@@ -146,7 +145,9 @@ public class Communicator implements ICommunicator {
 	
 			} catch (Exception t) {
 				if (opencms != null) {
-					opencms.shutDown();
+					try {
+						opencms.shutDown();
+					} catch (Exception ex) {}
 				}
 				OpenCmsClassLoader.markInvalid();
 				ExceptionUtils.throwCoreException(t);

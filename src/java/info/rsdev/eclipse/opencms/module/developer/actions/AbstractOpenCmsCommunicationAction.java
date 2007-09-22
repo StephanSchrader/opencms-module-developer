@@ -78,7 +78,6 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 								ExceptionUtils.showErrorDialog(t, shell);
 							} finally {
 								CommunicatorUtils.close(communicator, false);
-								progressMonitor.done();
 							}
 						}
 					});
