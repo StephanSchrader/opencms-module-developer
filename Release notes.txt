@@ -20,6 +20,7 @@ Release 0.0.1 -- released on June 17, 2007
 
 Wishlist - for later releases
 - write unit- and integrationtests and make plugin more robust
+- take into account that eclipse files and folders can be under versioning control
 - Maintain OpenCms file properties in eclipse
 - Maintain other module info, such as exportpoints etc.
 - Connect/Disconnect with OpenCms from preferences page
