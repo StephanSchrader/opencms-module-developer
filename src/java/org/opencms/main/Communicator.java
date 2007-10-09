@@ -40,7 +40,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.opencms.configuration.CmsSystemConfiguration;
 import org.opencms.file.CmsFile;
