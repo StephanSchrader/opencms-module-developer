@@ -13,6 +13,7 @@ package org.opencms.main;
 import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 import info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleDeveloperPlugin;
+import info.rsdev.eclipse.opencms.module.developer.compatibility.CmsResourceCompatibility;
 import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
 import info.rsdev.eclipse.opencms.module.developer.loader.OpenCmsClassLoader;
 import info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsModuleDeveloperPreferencePage;
@@ -362,8 +363,8 @@ public class Communicator implements ICommunicator {
 		 * (like Boolean.FALSE, Boolean.TRUE etc.)
 		 */
 		CmsResource cmsResource = cms.readResource(parentFolderName, CmsResourceFilter.ALL);
-		boolean stateChanged = cmsResource.getState() != CmsResource.STATE_UNCHANGED;
-		boolean stateDeleted = cmsResource.getState() == CmsResource.STATE_DELETED;
+		boolean stateChanged = CmsResourceCompatibility.isChanged(cmsResource);
+		boolean stateDeleted = CmsResourceCompatibility.isDeleted(cmsResource);
 		
 		CmsLock lock = cms.getLock(parentFolderName);
         if (!lock.isNullLock() && stateChanged) {
@@ -390,7 +391,7 @@ public class Communicator implements ICommunicator {
 	
 	private void publishFile(CmsObject cms, String fileName) throws Exception {
 		CmsResource cmsResource = cms.readResource(fileName, CmsResourceFilter.ALL);
-		boolean stateChanged = cmsResource.getState() != CmsResource.STATE_UNCHANGED;
+		boolean stateChanged = CmsResourceCompatibility.isChanged(cmsResource);
 		
 		CmsLock lock = cms.getLock(fileName);
         if (!lock.isNullLock() && stateChanged) {
@@ -403,18 +404,18 @@ public class Communicator implements ICommunicator {
         
 	}
 	
-	private void collectRemoteResources(CmsObject cms, String parentFolderName, List publishList) throws Exception {
-		List childResources = cms.getResourcesInFolder(parentFolderName, CmsResourceFilter.ALL);
-		for (int i=0; i < childResources.size(); i++) {
-			CmsResource resource = (CmsResource)childResources.get(i);
-			if (resource instanceof CmsFolder) {
-				publishList.add(resource);
-				collectRemoteResources(cms, resource.getRootPath(), publishList);
-			} else {
-				publishList.add(resource);
-			}
-		}
-	}
+//	private void collectRemoteResources(CmsObject cms, String parentFolderName, List publishList) throws Exception {
+//		List childResources = cms.getResourcesInFolder(parentFolderName, CmsResourceFilter.ALL);
+//		for (int i=0; i < childResources.size(); i++) {
+//			CmsResource resource = (CmsResource)childResources.get(i);
+//			if (resource instanceof CmsFolder) {
+//				publishList.add(resource);
+//				collectRemoteResources(cms, resource.getRootPath(), publishList);
+//			} else {
+//				publishList.add(resource);
+//			}
+//		}
+//	}
 	
 //	private void publishFile(CmsObject cms, String resourceName, List publishList) throws Exception {
 //	}
