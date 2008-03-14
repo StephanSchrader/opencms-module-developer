@@ -46,8 +46,7 @@ public class ExceptionUtils {
 			ce = new CoreException(status);
 		}
 		
-		//TODO: show message of root exception
-		//log message to logfile
+		//show message of root exception log message to logfile
 		OpenCmsModuleDeveloperPlugin.getDefault().getLog().log(ce.getStatus());
 		
 		throw ce;

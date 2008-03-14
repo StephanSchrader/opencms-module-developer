@@ -10,10 +10,10 @@
  */
 package info.rsdev.eclipse.opencms.module.developer.actions;
 
-import java.util.Iterator;
-
 import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
+
+import java.util.Iterator;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -74,9 +74,10 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 									}
 									progressMonitor.worked(1000);
 								}
-							} catch (CoreException t) {
-								ExceptionUtils.showErrorDialog(t, shell);
-							} finally {
+							} catch (CoreException ce) {
+								throw new RuntimeException(ce);
+							}
+							finally {
 								CommunicatorUtils.close(communicator, false);
 							}
 						}
@@ -85,11 +86,18 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 					//Cancelled by user -- do nothing for now (in future, reverse action?? -- how
 					ie.printStackTrace();
 				} catch (Exception e) {
-					ExceptionUtils.throwCoreException(e);
+					throw new RuntimeException(e);
 				}
 			}
 		} catch (CoreException t) {
 			ExceptionUtils.showErrorDialog(t, shell);
+		} catch (RuntimeException re) {
+			if (re.getCause() instanceof CoreException) {
+				//Move
+				ExceptionUtils.showErrorDialog((CoreException)re.getCause(), shell);
+			} else {
+				throw re;
+			}
 		}
 	}
 	
