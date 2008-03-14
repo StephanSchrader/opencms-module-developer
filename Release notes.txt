@@ -1,6 +1,10 @@
 OpenCms Module Developer Eclipse plug-in
 
-Release 0.0.3 -- to be released
+Release 0.0.4
+- repair compatibility issue introduced in OpenCms 7.0.4
+
+
+Release 0.0.3 -- released on October 31, 2007
 - Show progressbar when communicating with OpenCms
 - fixed bug 1767941 that occured on Linux based systems
 - fixed bug 1758758 copy to opencms and publish NOT working

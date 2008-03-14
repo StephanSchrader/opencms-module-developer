@@ -13,7 +13,7 @@ package org.opencms.main;
 import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 import info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleDeveloperPlugin;
-import info.rsdev.eclipse.opencms.module.developer.compatibility.CmsResourceCompatibility;
+import info.rsdev.eclipse.opencms.module.developer.compatibility.CmsCompatibilityHelper;
 import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
 import info.rsdev.eclipse.opencms.module.developer.loader.OpenCmsClassLoader;
 import info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsModuleDeveloperPreferencePage;
@@ -102,7 +102,7 @@ public class Communicator implements ICommunicator {
 					progressMonitor.subTask(Messages.task_configure_opencms);
 				}
 				opencms = OpenCmsCore.getInstance();
-				opencms.getSystemInfo().init(webinfLocation, servletMapping, null, webappName);
+				CmsCompatibilityHelper.initCmsSystemInfo(opencms.getSystemInfo(), webinfLocation, servletMapping, webappName);
 				ExtendedProperties configuration = null;
 				String propertyPath = opencms.getSystemInfo().getConfigurationFileRfsPath();
 				configuration = CmsPropertyUtils.loadProperties(propertyPath);
@@ -363,8 +363,8 @@ public class Communicator implements ICommunicator {
 		 * (like Boolean.FALSE, Boolean.TRUE etc.)
 		 */
 		CmsResource cmsResource = cms.readResource(parentFolderName, CmsResourceFilter.ALL);
-		boolean stateChanged = CmsResourceCompatibility.isChanged(cmsResource);
-		boolean stateDeleted = CmsResourceCompatibility.isDeleted(cmsResource);
+		boolean stateChanged = CmsCompatibilityHelper.isChanged(cmsResource);
+		boolean stateDeleted = CmsCompatibilityHelper.isDeleted(cmsResource);
 		
 		CmsLock lock = cms.getLock(parentFolderName);
         if (!lock.isNullLock() && stateChanged) {
@@ -391,7 +391,7 @@ public class Communicator implements ICommunicator {
 	
 	private void publishFile(CmsObject cms, String fileName) throws Exception {
 		CmsResource cmsResource = cms.readResource(fileName, CmsResourceFilter.ALL);
-		boolean stateChanged = CmsResourceCompatibility.isChanged(cmsResource);
+		boolean stateChanged = CmsCompatibilityHelper.isChanged(cmsResource);
 		
 		CmsLock lock = cms.getLock(fileName);
         if (!lock.isNullLock() && stateChanged) {
