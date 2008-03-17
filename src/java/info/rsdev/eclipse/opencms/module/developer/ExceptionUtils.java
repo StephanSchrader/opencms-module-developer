@@ -26,6 +26,17 @@ public class ExceptionUtils {
 	private ExceptionUtils() {}
 	
 	public static void throwCoreException(Throwable t) throws CoreException {
+		CoreException ce = makeCoreException(t);
+		throw ce;
+	}
+	
+	/**
+	 * Turn the Throwable into a CoreException (if it not yet is one) and
+	 * output it to the Eclipse Log-file.
+	 * @param t
+	 * @return
+	 */
+	public static CoreException makeCoreException(Throwable t) {
 		CoreException ce = null;
 		if (t instanceof CoreException) {
 			ce = (CoreException)t;
@@ -49,7 +60,7 @@ public class ExceptionUtils {
 		//show message of root exception log message to logfile
 		OpenCmsModuleDeveloperPlugin.getDefault().getLog().log(ce.getStatus());
 		
-		throw ce;
+		return ce;
 	}
 	
 	private static IStatus setMessage(IStatus status, String rootMessage) {

@@ -100,11 +100,17 @@ public class NewModuleWizard extends Wizard implements INewWizard {
 					}
 				}
 			});
-		} catch (InvocationTargetException e) {
-			e.printStackTrace(System.out);
-			return false;
 		} catch (InterruptedException e) {
 			// User canceled, so stop but don't close wizard.
+			return false;
+		} catch (Exception e) {
+			CoreException ce = null;
+			if (e.getCause() instanceof CoreException) {
+				ce = (CoreException)e.getCause();
+			} else {
+				ce = ExceptionUtils.makeCoreException(e);
+			}
+			ExceptionUtils.showErrorDialog(ce, getShell());
 			return false;
 		}
 		return true;
@@ -173,8 +179,6 @@ public class NewModuleWizard extends Wizard implements INewWizard {
 					communicator.createModule(descriptor, monitor);
 				}
 			}
-		} catch (CoreException ce) {
-			ExceptionUtils.showErrorDialog(ce, getShell());
 		} finally {
 			CommunicatorUtils.close(communicator, false);
 		}

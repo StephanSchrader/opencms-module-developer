@@ -13,6 +13,7 @@ package info.rsdev.eclipse.opencms.module.developer.actions;
 import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IProject;
@@ -47,57 +48,51 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 		try {
 			if ((selection instanceof StructuredSelection) && (CommunicatorUtils.isProperlyConfigured())) {
 				ProgressMonitorDialog monitorDialog = new ProgressMonitorDialog(shell);
-				try {
-					monitorDialog.run(true, true, new IRunnableWithProgress() {
-						
-						ICommunicator communicator = null;
-						
-						public void run(IProgressMonitor progressMonitor) {
-							/* Setup the progress monitor: 5000 units of work for connecting to OpenCms
-							 * and 1000 units of work for each project
+				monitorDialog.run(true, true, new IRunnableWithProgress() {
+					
+					ICommunicator communicator = null;
+					
+					public void run(IProgressMonitor progressMonitor) throws InvocationTargetException {
+						/* Setup the progress monitor: 5000 units of work for connecting to OpenCms
+						 * and 1000 units of work for each project
+						 */
+						StructuredSelection structuredSelection = (StructuredSelection)selection;
+						int numberOfSelectedProjects = structuredSelection.size();
+						progressMonitor.beginTask(action.getDescription(), 5000+1000*numberOfSelectedProjects);
+						try {
+							communicator = CommunicatorUtils.getCommunicator(progressMonitor);
+							progressMonitor.worked(5000);
+							
+							/* iterate over the selected projects and execute the action of the subclass 
+							 * implementeation on each project
 							 */
-							StructuredSelection structuredSelection = (StructuredSelection)selection;
-							int numberOfSelectedProjects = structuredSelection.size();
-							progressMonitor.beginTask(action.getDescription(), 5000+1000*numberOfSelectedProjects);
-							try {
-								communicator = CommunicatorUtils.getCommunicator(progressMonitor);
-								progressMonitor.worked(5000);
-								
-								/* iterate over the selected projects and execute the action of the subclass 
-								 * implementeation on each project
-								 */
-								Iterator iterator = structuredSelection.iterator();
-								while (iterator.hasNext()) {
-									Object selectedItem = iterator.next();
-									if (selectedItem instanceof IProject) {
-										execute((IProject)selectedItem, communicator, progressMonitor);
-									}
-									progressMonitor.worked(1000);
+							Iterator iterator = structuredSelection.iterator();
+							while (iterator.hasNext()) {
+								Object selectedItem = iterator.next();
+								if (selectedItem instanceof IProject) {
+									execute((IProject)selectedItem, communicator, progressMonitor);
 								}
-							} catch (CoreException ce) {
-								throw new RuntimeException(ce);
+								progressMonitor.worked(1000);
 							}
-							finally {
-								CommunicatorUtils.close(communicator, false);
-							}
+						} catch (CoreException ce) {
+							throw new InvocationTargetException(ce);
 						}
-					});
-				} catch (InterruptedException ie) {
-					//Cancelled by user -- do nothing for now (in future, reverse action?? -- how
-					ie.printStackTrace();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+						finally {
+							CommunicatorUtils.close(communicator, false);
+						}
+					}
+				});
 			}
 		} catch (CoreException t) {
 			ExceptionUtils.showErrorDialog(t, shell);
-		} catch (RuntimeException re) {
-			if (re.getCause() instanceof CoreException) {
-				//Move
-				ExceptionUtils.showErrorDialog((CoreException)re.getCause(), shell);
+		} catch (Exception e) {
+			CoreException ce = null;
+			if (e.getCause() instanceof CoreException) {
+				ce = (CoreException)e.getCause();
 			} else {
-				throw re;
+				ce = ExceptionUtils.makeCoreException(e);
 			}
+			ExceptionUtils.showErrorDialog(ce, shell);
 		}
 	}
 	
