@@ -95,7 +95,7 @@ public class NewModuleWizard extends Wizard implements INewWizard {
 				{
 					try {
 						createNewModule(monitor, data);
-					} catch (CoreException e) {
+					} catch (Exception e) {
 						throw new InvocationTargetException(e);
 					}
 				}

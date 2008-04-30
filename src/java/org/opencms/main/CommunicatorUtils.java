@@ -84,11 +84,11 @@ public class CommunicatorUtils {
 		return isProperlyConfigured;
 	}
 	
-	public static void close(ICommunicator communicator, boolean force) {
+	public static void close(ICommunicator communicator, boolean forceClose) {
 		if (communicator != null) {
 			Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
 			boolean keepAlive = preferences.getBoolean(OpenCmsModuleDeveloperPreferencePage.OPENCMS_KEEP_ALIVE);
-			if (force || !keepAlive) {
+			if (forceClose || !keepAlive) {
 				communicator.close();
 			}
 		}

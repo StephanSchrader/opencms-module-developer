@@ -14,6 +14,7 @@ import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -188,7 +189,7 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 									
 									ICommunicator communicator = null;
 									
-									public void run(IProgressMonitor progressMonitor) {
+									public void run(IProgressMonitor progressMonitor) throws InvocationTargetException {
 										
 										/* Setup the progress monitor: 5000 units of work for connecting to OpenCms
 										 * and 1000 units of work for fetching the modules
@@ -201,9 +202,8 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 											moduleNames.addAll(communicator.getModules(progressMonitor));
 											progressMonitor.worked(1000);
 										} catch (CoreException t) {
-											ExceptionUtils.showErrorDialog(t, shell);
+											throw new InvocationTargetException(t);	//sneak CoreException outside this thread
 										} finally {
-											CommunicatorUtils.close(communicator, false);
 											progressMonitor.done();
 										}
 									}
@@ -212,7 +212,13 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 								//Cancelled by user -- do nothing for now (in future, reverse action?? -- how
 								ie.printStackTrace();
 							} catch (Exception e) {
-								ExceptionUtils.throwCoreException(e);
+								CoreException ce = null;
+								if (e.getCause() instanceof CoreException) {
+									ce = (CoreException)e.getCause();
+								} else {
+									ce = ExceptionUtils.makeCoreException(e);
+								}
+								ExceptionUtils.showErrorDialog(ce, shell);
 							}
 						}
 					} catch (CoreException ce) {

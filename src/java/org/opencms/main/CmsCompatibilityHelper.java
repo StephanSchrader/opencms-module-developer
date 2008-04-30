@@ -8,7 +8,7 @@
  * Contributors:
  *     Red Star Development - initial API and implementation
  */
-package info.rsdev.eclipse.opencms.module.developer.compatibility;
+package org.opencms.main;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

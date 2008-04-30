@@ -2,6 +2,8 @@ OpenCms Module Developer Eclipse plug-in
 
 Release 0.0.4
 - repair compatibility issue introduced in OpenCms 7.0.4
+- get rid of the 'org.eclipse.swt.SWTException: Invalid thread access' and show real Exception
+
 
 Release 0.0.3 -- released on October 31, 2007
 - Show progressbar when communicating with OpenCms
