@@ -13,6 +13,7 @@ package org.opencms.main;
 import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
 import info.rsdev.eclipse.opencms.module.developer.Messages;
 import info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleDeveloperPlugin;
+import info.rsdev.eclipse.opencms.module.developer.compatibility.CmsCompatibilityHelper;
 import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
 import info.rsdev.eclipse.opencms.module.developer.loader.OpenCmsClassLoader;
 import info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsModuleDeveloperPreferencePage;
