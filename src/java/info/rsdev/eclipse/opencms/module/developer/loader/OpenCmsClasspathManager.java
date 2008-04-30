@@ -68,7 +68,6 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		String additionalEntries = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_ADDITIONAL_JARS);
 		if ((additionalEntries != null) && (additionalEntries.length() > 0)) {
 			String[] entries = additionalEntries.split("\\?");
-			File[] fileEntries = new File[entries.length];
 			if ((entries != null) && (entries.length > 0)) {
 				for (int i = 0; i < entries.length; i++) {
 					String entry = entries[i];
@@ -184,7 +183,6 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		
 		URL resourceURL = null;
 		
-		InputStream entryStream = null;
 		if (isJarFile(file)) {
 			JarFile jarFile = new JarFile(file);
 			JarEntry jarEntry = jarFile.getJarEntry(resourceName);

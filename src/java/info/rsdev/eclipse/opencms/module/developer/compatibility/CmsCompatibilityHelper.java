@@ -18,8 +18,9 @@ import org.opencms.file.CmsResource;
 import org.opencms.main.CmsSystemInfo;
 
 /**
+ * This class is used to provide a bridge between incompatible OpenCms versions
+ * 
  * @author Dave Schoorl
- *
  */
 public class CmsCompatibilityHelper {
 	
@@ -96,7 +97,7 @@ public class CmsCompatibilityHelper {
 	 * @param systemInfo
 	 */
 	public static void initCmsSystemInfo(CmsSystemInfo systemInfo, String webinfLocation, String servletMapping, String webappName) {
-		Method initMethod = findUniqueMethod("init", systemInfo.getClass().getMethods());
+		Method initMethod = findUniqueMethod("init", systemInfo.getClass().getDeclaredMethods());
 		Class[] parameterTypes = null;
 		if (initMethod != null) {
 			parameterTypes = initMethod.getParameterTypes();
@@ -106,14 +107,15 @@ public class CmsCompatibilityHelper {
 			Object[] parameterValues = null;
 			if (parameterTypes.length == 4) {
 				//We are dealing with OpenCms 7.0.3 or earlier
-				parameterValues = new Object[] { webinfLocation, servletMapping, webappName, null};
+				parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName};
 			} else if (parameterTypes.length == 5) {
 				//We are dealing with OpenCms 7.0.4 or later
 				String servletContainerName = null;	//not relevant, since we are running outside container
-				parameterValues = new Object[] { webinfLocation, servletMapping, webappName, null, servletContainerName};
+				parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName, servletContainerName};
 			}
 			
 			try {
+				initMethod.setAccessible(true);	//the init-method is protected
 				initMethod.invoke(systemInfo, parameterValues);
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
