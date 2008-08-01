@@ -90,9 +90,15 @@ public class CmsCompatibilityHelper {
 	 * As of OpenCms 7.0.4, the signature of the CmsSystemInfo initializer has changed: a
 	 * new parameter, called servletContainerName is added, breaking backwards compatibility.
 	 * 
-	 * This method will use reflection to check whether 4 or 5 parameters are needed by the
+	 * And as of OpenCms 7.0.5 there has been added another parameter to the signature of the
+	 * CmsSystemInfo initializer called throwException, breaking backwards compatibility.
+	 * 
+	 * This method will use reflection to check whether 4, 5 or 6 parameters are needed by the
 	 * init-method. When we are running on OpenCms 7.0.4 or newer, we will use a null value for 
 	 * the servletContainerName, since we are running OpenCms outside of the ServletContainer.
+	 * When we are running 7.0.5 or newer, we will provide the Boolean value TRUE for the 
+	 * throwException parameter. This parameter is not relevant for us, since we are running
+	 * outside a servlet container.
 	 * 
 	 * @param systemInfo
 	 */
@@ -112,6 +118,11 @@ public class CmsCompatibilityHelper {
 				//We are dealing with OpenCms 7.0.4 or later
 				String servletContainerName = null;	//not relevant, since we are running outside container
 				parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName, servletContainerName};
+			} else if (parameterTypes.length == 6) {
+			    //We are dealing with OpenCms 7.0.5 or later
+			    String servletContainerName = null;    //not relevant, since we are running outside container
+			    Boolean throwException = Boolean.TRUE;
+			    parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName, servletContainerName, throwException };
 			}
 			
 			try {
