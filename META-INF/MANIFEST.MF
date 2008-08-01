@@ -24,3 +24,4 @@ Export-Package: info.rsdev.eclipse.opencms.module.developer,
  info.rsdev.eclipse.opencms.module.developer.preferences.actions,
  info.rsdev.eclipse.opencms.module.developer.wizards,
  org.opencms.main
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
