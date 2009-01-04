@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +52,7 @@ import org.opencms.lock.CmsLock;
 import org.opencms.module.CmsModule;
 import org.opencms.module.CmsModuleManager;
 import org.opencms.util.CmsPropertyUtils;
+import org.opencms.util.CmsStringUtil;
 
 /**
  * This class is responsible for starting a communication session with OpenCms. 
@@ -136,7 +136,7 @@ public class Communicator implements ICommunicator {
 //					
 //				});
 //				progressBarUpdateThread.start();
-				opencms = opencms.upgradeRunlevel(configuration);	//this is a longrunning operation when connection to OpenCms does noet yet exist
+				opencms = opencms.upgradeRunlevel(configuration);	//this is a longrunning operation when connection to OpenCms does not yet exist
 				if (progressMonitor != null) {
 					progressMonitor.worked(4000);
 				}
@@ -268,11 +268,48 @@ public class Communicator implements ICommunicator {
 			ExceptionUtils.throwCoreException(e);
 		}
 	}
+	
+	public void getFromServer(IResource resource, IProgressMonitor progressMonitor)
+			throws CoreException {
+		
+		if (resource instanceof IProject) {
+			getFromServer((IProject)resource, progressMonitor );
+		} else if (resource instanceof IFolder) {
+			getFromServer((IFolder)resource, progressMonitor );
+		} else if (resource instanceof IFile) {
+			getFromServer((IFile)resource, progressMonitor );
+		}
+	}
+	
+	public void copyToServer(IResource resource, IProgressMonitor progressMonitor)
+			throws CoreException {
+		
+		if (resource instanceof IFile) {
+			copyToServer((IFile)resource, progressMonitor );
+		}  else if (resource instanceof IFolder) {
+			copyToServer((IFolder)resource, progressMonitor );
+		} else if (resource instanceof IProject) {
+			copyToServer((IProject)resource, progressMonitor );
+		}
+		
+	}
+
+	public void publish(IResource resource, IProgressMonitor progressMonitor)
+			throws CoreException {
+		
+		if (resource instanceof IProject) {
+			publish((IProject)resource, progressMonitor );
+		} else if (resource instanceof IFolder) {
+			publish((IFolder)resource, progressMonitor );
+		} else if (resource instanceof IFile) {
+			publish((IFile)resource, progressMonitor );
+		}
+	}	
 
 	/* (non-Javadoc)
 	 * @see org.opencms.main.ICommunicator#copyToServer(org.eclipse.jdt.core.IJavaProject)
 	 */
-	public void copyToServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
+	protected void copyToServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
 		CmsObject cms = getCmsObject();
 		if (cms != null) {
 			try {
@@ -289,7 +326,10 @@ public class Communicator implements ICommunicator {
 						for (int i=0; i < contents.length; i++) {
 							if (contents[i] instanceof IFolder) {
 								preserveOpenCmsCounterpart(contents[i], remoteSubFolders);
-								uploadFolderContents(cms, openCmsModuleFolder, (IFolder)contents[i]);
+								String folderName = ((IFolder)contents[i]).getName();
+								if (canCopyToServer(folderName) ) {
+									uploadFolderContents(cms, openCmsModuleFolder, (IFolder)contents[i]);
+								}
 							}
 						}
 						for (int i=0; i<remoteSubFolders.size(); i++) {
@@ -305,29 +345,96 @@ public class Communicator implements ICommunicator {
 			}
 		}
 	}
+	
+	protected void copyToServer(IFolder folder, IProgressMonitor progressMonitor) throws CoreException {
+		if (!canCopyToServer(folder.getProjectRelativePath().toString()))
+			return;
+		
+		CmsObject cms = getCmsObject();
+		if (cms != null) {
+			try {
+				String eclipseProjectName = folder.getProject().getName();
+				OpenCmsModuleDescriptor descriptor = new OpenCmsModuleDescriptor(eclipseProjectName);
+				CmsFolder openCmsModuleFolder = getModuleFolder(cms, descriptor, true);
+				
+				String parentPath = CmsResource.getParentFolder(openCmsModuleFolder.getRootPath() + folder.getProjectRelativePath());
+				CmsFolder remoteParentFolder = getOpenCmsFolder(cms, parentPath);
+				
+				uploadFolderContents(cms, remoteParentFolder, folder);
+				
+			} catch (Throwable t) {
+				ExceptionUtils.throwCoreException(t);
+			}
+		}
+	}	
+	
+	protected void copyToServer(IFile file, IProgressMonitor progressMonitor) throws CoreException {
+		if (!canCopyToServer(file.getProjectRelativePath().toString()))
+			return;
+		
+		CmsObject cms = getCmsObject();
+		if (cms != null) {
+			try {
+				String eclipseProjectName = file.getProject().getName();
+				OpenCmsModuleDescriptor descriptor = new OpenCmsModuleDescriptor(eclipseProjectName);
+				CmsFolder openCmsModuleFolder = getModuleFolder(cms, descriptor, true);
+				
+				String resourceName = openCmsModuleFolder.getRootPath() + file.getProjectRelativePath();
+				String resourcePath = CmsResource.getFolderPath(resourceName);
+				CmsFolder remoteFolder = getOpenCmsFolder(cms, resourcePath);
+				
+				boolean found = false;
+				if (cms.existsResource(resourceName, CmsResourceFilter.IGNORE_EXPIRATION)) {
+					found = true;
+				} else {
+					String resourceName1 = resourceName.substring(0, resourceName.lastIndexOf('.'));
+					if (cms.existsResource(resourceName1, CmsResourceFilter.IGNORE_EXPIRATION)) {
+						found = true;
+						resourceName = resourceName1;
+					}
+				}
+
+				CmsFile remoteFile = null;
+				if(found) {
+					try{
+						remoteFile = cms.readFile(resourceName, CmsResourceFilter.IGNORE_EXPIRATION);
+					} catch(CmsException e) {
+						cms.lockResource(resourceName);
+						cms.renameResource(resourceName, resourceName + ".bak");
+						cms.unlockResource(resourceName + ".bak");
+					}
+				}
+
+				uploadFileContents(cms, remoteFile, remoteFolder, file); 
+				
+			} catch (Throwable t) {
+				ExceptionUtils.throwCoreException(t);
+			}
+		}
+	}
+	
 
 	/* (non-Javadoc)
 	 * @see org.opencms.main.ICommunicator#getFromServer(org.eclipse.jdt.core.IJavaProject)
 	 */
-	public void getFromServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
+	protected void getFromServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
 		CmsObject cms = getCmsObject();
 		if (cms != null) {
 			try {
 				String eclipseProjectName = javaProject.getName();
 				OpenCmsModuleDescriptor descriptor = new OpenCmsModuleDescriptor(eclipseProjectName);
 				CmsFolder openCmsModuleFolder = getModuleFolder(cms, descriptor, false);
-				List outputFolders = Arrays.asList(new String[] { "classes", "src" });
 				if (openCmsModuleFolder != null) {
 					//download the module from the server and replace all local contents, 
 					//except for the src and classes directories.
 					String moduleFolderName = openCmsModuleFolder.getRootPath();
-					List remoteResources = cms.getResourcesInFolder(moduleFolderName, CmsResourceFilter.DEFAULT);
+					List remoteResources = cms.getResourcesInFolder(moduleFolderName, CmsResourceFilter.IGNORE_EXPIRATION);
 					Iterator remoteResourceIterator = remoteResources.iterator(); 
 					while (remoteResourceIterator.hasNext()) {
 						CmsResource remoteResource = (CmsResource)remoteResourceIterator.next();
 						if (remoteResource.isFolder()) {
-							String remoteResourceName = remoteResource.getRootPath();
-							if (outputFolders.contains(remoteResourceName) == false) {
+							String remoteResourceName = remoteResource.getName();
+							if (canDownloadFromServer(remoteResourceName)) {
 								downloadFolderContents(cms, javaProject, (CmsFolder)remoteResource);
 							}
 						}
@@ -338,8 +445,82 @@ public class Communicator implements ICommunicator {
 			}
 		}
 	}
+	
+	protected void getFromServer(IFolder folder, IProgressMonitor progressMonitor) throws CoreException {
+		if (!canDownloadFromServer(folder.getProjectRelativePath().toString()))
+			return;
 
-	public void publish(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
+		CmsObject cms = getCmsObject();
+		if (cms != null) {
+			try {
+				
+				String eclipseProjectName = folder.getProject().getName();
+				OpenCmsModuleDescriptor descriptor = new OpenCmsModuleDescriptor(eclipseProjectName);
+				CmsFolder openCmsModuleFolder = getModuleFolder(cms, descriptor, false);
+				String folderName = openCmsModuleFolder.getRootPath() + folder.getProjectRelativePath();
+				
+				CmsFolder remoteFolder = null;
+				try{
+					remoteFolder = cms.readFolder(folderName, CmsResourceFilter.IGNORE_EXPIRATION);
+				} catch(CmsException e){
+					
+				}
+				if (null != remoteFolder) {
+					downloadFolderContents(cms, folder.getParent(), remoteFolder);
+				}
+
+			} catch (Throwable t) {
+				ExceptionUtils.throwCoreException(t);
+			}
+		}
+	}	
+	
+	protected void getFromServer(IFile file, IProgressMonitor progressMonitor) throws CoreException {
+		if (!canDownloadFromServer(file.getProjectRelativePath().toString()))
+			return;
+
+		CmsObject cms = getCmsObject();
+		if (cms != null) {
+			try {
+				String eclipseProjectName = file.getProject().getName();
+				OpenCmsModuleDescriptor descriptor = new OpenCmsModuleDescriptor(eclipseProjectName);
+				CmsFolder openCmsModuleFolder = getModuleFolder(cms, descriptor, false);
+				String resourceName = openCmsModuleFolder.getRootPath() + file.getProjectRelativePath();
+				
+				boolean found = false;
+				if (cms.existsResource(resourceName, CmsResourceFilter.IGNORE_EXPIRATION)) {
+					found = true;
+				} else {
+					String resourceName1 = resourceName.substring(0, resourceName.lastIndexOf('.'));
+					if (cms.existsResource(resourceName1, CmsResourceFilter.IGNORE_EXPIRATION)) {
+						found = true;
+						resourceName = resourceName1;
+					}
+				}
+				if (found) {
+					CmsFile remoteFile = null;
+					try{
+						remoteFile = cms.readFile(resourceName, CmsResourceFilter.IGNORE_EXPIRATION);
+					} catch(CmsException e){
+						;
+					}
+					
+					if (null != remoteFile) {
+						if(file.exists()) {
+							file.delete(true, null);
+						}
+						
+						downloadFileContents(cms, file.getParent(), remoteFile);
+					}
+				}
+
+			} catch (Throwable t) {
+				ExceptionUtils.throwCoreException(t);
+			}
+		}
+	}	
+
+	protected void publish(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
 		//throw new UnsupportedOperationException("Publishing is not yet implemented");
 		CmsObject cms = getCmsObject();
 		if (cms != null) {
@@ -354,6 +535,43 @@ public class Communicator implements ICommunicator {
 			}
 		}
 	}
+	
+	protected void publish(IFolder folder, IProgressMonitor progressMonitor) throws CoreException {
+		//throw new UnsupportedOperationException("Publishing is not yet implemented");
+		CmsObject cms = getCmsObject();
+		if (cms != null) {
+			try {
+				String eclipseProjectName = folder.getProject().getName();
+				OpenCmsModuleDescriptor descriptor = new OpenCmsModuleDescriptor(eclipseProjectName);
+				CmsFolder openCmsModuleFolder = getModuleFolder(cms, descriptor, false);
+				String resourceName = openCmsModuleFolder.getRootPath() + folder.getProjectRelativePath();
+				publishFolder(cms, resourceName);
+			} catch (Throwable t) {
+				ExceptionUtils.throwCoreException(t);
+			}
+		}
+	}
+	
+	protected void publish(IFile file, IProgressMonitor progressMonitor) throws CoreException {
+		//throw new UnsupportedOperationException("Publishing is not yet implemented");
+		CmsObject cms = getCmsObject();
+		if (cms != null) {
+			try {
+				String eclipseProjectName = file.getProject().getName();
+				OpenCmsModuleDescriptor descriptor = new OpenCmsModuleDescriptor(eclipseProjectName);
+				CmsFolder openCmsModuleFolder = getModuleFolder(cms, descriptor, false);
+				String resourceName = openCmsModuleFolder.getRootPath() + file.getProjectRelativePath();
+				
+				if(!cms.existsResource(resourceName, CmsResourceFilter.IGNORE_EXPIRATION)) {
+					resourceName = resourceName.substring(0, resourceName.lastIndexOf('.'));
+				}
+				
+				publishFile(cms, resourceName);
+			} catch (Throwable t) {
+				ExceptionUtils.throwCoreException(t);
+			}
+		}
+	}		
 	
 	private void publishFolder(CmsObject cms, String parentFolderName) throws Exception {
 		/* There has been a change in the public interface between OpenCms 6 and 7 related
@@ -372,6 +590,11 @@ public class Communicator implements ICommunicator {
         }
 
         if (stateChanged) {
+        	/* The commented code line below is the OpenCms 7.x way of publishing, but it is not
+        	 * compatible with openCms 6.x, therefore we currently still keep on using the deprecated  
+        	 * OpenCms 6.x way. In the future this might be relocated to the CmsCompatibilityHelper-class.
+        	 */
+//        	OpenCms.getPublishManager().publishResource(cms, parentFolderName);
         	cms.publishResource(parentFolderName);
         }
         
@@ -399,26 +622,33 @@ public class Communicator implements ICommunicator {
         }
         
         if (stateChanged) {
+        	/* The commented code line below is the OpenCms 7.x way of publishing, but it is not
+        	 * compatible with openCms 6.x, therefore we currently still keep on using the deprecated  
+        	 * OpenCms 6.x way. In the future this might be relocated to the CmsCompatibilityHelper-class.
+        	 */
+//        	OpenCms.getPublishManager().publishResource(cms, fileName);
         	cms.publishResource(fileName);
         }
         
 	}
 	
-//	private void collectRemoteResources(CmsObject cms, String parentFolderName, List publishList) throws Exception {
-//		List childResources = cms.getResourcesInFolder(parentFolderName, CmsResourceFilter.ALL);
-//		for (int i=0; i < childResources.size(); i++) {
-//			CmsResource resource = (CmsResource)childResources.get(i);
-//			if (resource instanceof CmsFolder) {
-//				publishList.add(resource);
-//				collectRemoteResources(cms, resource.getRootPath(), publishList);
-//			} else {
-//				publishList.add(resource);
-//			}
-//		}
-//	}
-	
-//	private void publishFile(CmsObject cms, String resourceName, List publishList) throws Exception {
-//	}
+	private boolean canCopyToServer(String resourceName) {
+		if(CmsStringUtil.isNotEmptyOrWhitespaceOnly(resourceName)
+			&& !(resourceName.startsWith(".") || resourceName.toLowerCase().startsWith("test"))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean canDownloadFromServer(String resourceName) {
+		if(CmsStringUtil.isNotEmptyOrWhitespaceOnly(resourceName)
+			&& !(resourceName.toLowerCase().startsWith("src") || resourceName.toLowerCase().startsWith("classes"))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	
 	
@@ -662,6 +892,7 @@ public class Communicator implements ICommunicator {
 		}
 	}
 	
+	
 	private CmsResource preserveOpenCmsCounterpart(IResource resource, List remoteResources) {
 		CmsResource remoteResource = null;
 		String localResourceName = resource.getName(); 
@@ -696,6 +927,7 @@ public class Communicator implements ICommunicator {
 
 	private int getOpenCmsType(String extension) {
 		int cmsFileType = OpenCmsConstants.OPENCMS_TYPE_BINARY;
+		if(null != extension) extension = extension.toLowerCase();
 		if (OpenCmsConstants.OPENCMS_TYPE_MAPPING.containsKey(extension)) {
 			cmsFileType = ((Integer)OpenCmsConstants.OPENCMS_TYPE_MAPPING.get(extension)).intValue();
 		}

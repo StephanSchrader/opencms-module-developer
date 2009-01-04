@@ -31,8 +31,8 @@ public class AdditionalJarsChangedAction implements PreferenceChangedAction {
 	 * @see info.rsdev.eclipse.opencms.module.developer.actions.PreferenceChangedAction#execute(java.lang.String, java.lang.String)
 	 */
 	public void execute(String oldValue, String newValue) {
-		List oldFileNames = new ArrayList();
-		List newFileNames = new ArrayList();
+		List<String> oldFileNames = new ArrayList<String>();
+		List<String> newFileNames = new ArrayList<String>();
 		//transform String to List for both old and new value
 		if ((oldValue != null) && (oldValue.length() > 0)) {
 			oldFileNames.addAll(Arrays.asList(oldValue.split("\\?")));
@@ -45,11 +45,11 @@ public class AdditionalJarsChangedAction implements PreferenceChangedAction {
 		updateOpenCmsLibrary(oldFileNames, newFileNames);
 	}
 	
-	private void updateClassLoader(List oldFileNames, List newFileNames) {
+	private void updateClassLoader(List<String> oldFileNames, List<String> newFileNames) {
 		OpenCmsClasspathManager.getInstance().changeAdditionalJars(oldFileNames, newFileNames);
 	}
 	
-	private void updateOpenCmsLibrary(List oldFileNames, List newFileNames) {
+	private void updateOpenCmsLibrary(List<String> oldFileNames, List<String> newFileNames) {
 		//TODO: go through all projects in the workspace and update the container
 		//IWorkspaceRoot root = null;
 	}

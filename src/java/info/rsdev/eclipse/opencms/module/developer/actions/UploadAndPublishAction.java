@@ -10,7 +10,7 @@
  */
 package info.rsdev.eclipse.opencms.module.developer.actions;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.opencms.main.ICommunicator;
@@ -21,9 +21,9 @@ import org.opencms.main.ICommunicator;
  */
 public class UploadAndPublishAction extends AbstractOpenCmsCommunicationAction {
 
-	public void execute(IProject project, ICommunicator communicator, IProgressMonitor progressMonitor) throws CoreException {
-		communicator.copyToServer(project, progressMonitor);
-		communicator.publish(project, progressMonitor);
+	public void execute(IResource resource, ICommunicator communicator, IProgressMonitor progressMonitor) throws CoreException {
+		communicator.copyToServer(resource, progressMonitor);
+		communicator.publish(resource, progressMonitor);
 	}
 
 }

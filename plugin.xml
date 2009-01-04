@@ -57,64 +57,56 @@
       <objectContribution
             adaptable="true"
             id="info.rsdev.eclipse.opencms.module.developer.actions.OpenCmsActionMenu"
-            objectClass="org.eclipse.core.resources.IProject">
+            objectClass="org.eclipse.core.resources.IResource">
          <menu
                id="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu"
                label="%menu.label.0"
                path="additions">
-            <groupMarker name="content"/>
-            <separator name="additions"/>
+          <groupMarker name="content"/>
+          <separator name="additions"/>
+          <filter
+              name="projectNature"
+              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
          </menu>
-         <visibility>
-            <objectState
-                  name="nature"
-                  value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
-         </visibility>
       </objectContribution>
       <objectContribution
             adaptable="true"
             id="info.rsdev.eclipse.opencms.module.developer.actions.GetFromServerMenuItem"
-            objectClass="org.eclipse.core.resources.IProject">
+            objectClass="org.eclipse.core.resources.IResource">
+          <filter
+              name="projectNature"
+              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
          <action
                class="info.rsdev.eclipse.opencms.module.developer.actions.GetFromServerAction"
                id="info.rsdev.eclipse.opencms.module.developer.actions.GetFromServerAction"
                label="Get from OpenCms server"
                menubarPath="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu/content"/>
-         <visibility>
-            <objectState
-                  name="nature"
-                  value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
-         </visibility>
       </objectContribution>
       <objectContribution
             adaptable="true"
             id="info.rsdev.eclipse.opencms.module.developer.actions.UploadAndPublishMenuItem"
-            objectClass="org.eclipse.core.resources.IProject">
+            objectClass="org.eclipse.core.resources.IResource">
+          <filter
+              name="projectNature"
+              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
          <action
                class="info.rsdev.eclipse.opencms.module.developer.actions.UploadAndPublishAction"
                id="info.rsdev.eclipse.opencms.module.developer.actions.UploadAndPublishAction"
                label="Copy to OpenCms server and Publish"
                menubarPath="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu/content"/>
-         <visibility>
-            <objectState
-                  name="nature"
-                  value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
-         </visibility>
       </objectContribution>
       <objectContribution
             adaptable="true"
             id="info.rsdev.eclipse.opencms.module.developer.actions.CopyToServerMenuItem"
-            objectClass="org.eclipse.core.resources.IProject">
+            objectClass="org.eclipse.core.resources.IResource">
+          <filter
+              name="projectNature"
+              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
          <action
                class="info.rsdev.eclipse.opencms.module.developer.actions.CopyToServerAction"
                id="info.rsdev.eclipse.opencms.module.developer.actions.CopyToServerAction"
                label="Copy to OpenCms server"
                menubarPath="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu/content"/>
-         <visibility>
-            <objectState
-                  name="nature"
-                  value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
-         </visibility>
       </objectContribution>
    </extension>
    <extension

@@ -14,12 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * TODO: make this configurable in preferences 
+ * 
  * @author Dave Schoorl
- *
  */
 public class OpenCmsConstants {
 
 	public static final int OPENCMS_TYPE_FOLDER = 0;
+	public static final int OPENCMS_TYPE_PLAIN = 1;
 	public static final int OPENCMS_TYPE_JSP = 4;
 	public static final int OPENCMS_TYPE_XMLPAGE = 6;
 	public static final int OPENCMS_TYPE_XMLCONTENT = 7;
@@ -28,6 +30,13 @@ public class OpenCmsConstants {
 	
 	public static final Map OPENCMS_TYPE_MAPPING = new HashMap();
 	static {
+		OPENCMS_TYPE_MAPPING.put("txt", new Integer(OPENCMS_TYPE_PLAIN));
+		OPENCMS_TYPE_MAPPING.put("css", new Integer(OPENCMS_TYPE_PLAIN));
+		OPENCMS_TYPE_MAPPING.put("htm", new Integer(OPENCMS_TYPE_PLAIN));
+		OPENCMS_TYPE_MAPPING.put("html", new Integer(OPENCMS_TYPE_PLAIN));
+		OPENCMS_TYPE_MAPPING.put("js", new Integer(OPENCMS_TYPE_PLAIN));
+		OPENCMS_TYPE_MAPPING.put("xsd", new Integer(OPENCMS_TYPE_PLAIN));
+		OPENCMS_TYPE_MAPPING.put("properties", new Integer(OPENCMS_TYPE_PLAIN));
 		OPENCMS_TYPE_MAPPING.put("jsp", new Integer(OPENCMS_TYPE_JSP));
 		OPENCMS_TYPE_MAPPING.put("xml", new Integer(OPENCMS_TYPE_XMLCONTENT));
 		OPENCMS_TYPE_MAPPING.put("pdf", new Integer(OPENCMS_TYPE_BINARY));

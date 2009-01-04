@@ -14,7 +14,7 @@ import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -28,11 +28,11 @@ public interface ICommunicator {
 	
 	public void createModule(OpenCmsModuleDescriptor descriptor, IProgressMonitor progressMonitor) throws CoreException;
 
-	public void getFromServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException;
+	public void getFromServer(IResource resource, IProgressMonitor progressMonitor) throws CoreException;
 	
-	public void copyToServer(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException;
+	public void copyToServer(IResource resource, IProgressMonitor progressMonitor) throws CoreException;
 
-	public void publish(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException;
+	public void publish(IResource resource, IProgressMonitor progressMonitor) throws CoreException;
 
 	public List getModules(IProgressMonitor progressMonitor) throws CoreException;
 

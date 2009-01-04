@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: info.rsdev.eclipse.opencms.module.developer;singleton:=true
-Bundle-Version: 0.0.5
+Bundle-Version: 0.0.6
 Bundle-Activator: info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleDeveloperPlugin
 Bundle-Vendor: %Bundle-Vendor.0
 Bundle-Localization: plugin

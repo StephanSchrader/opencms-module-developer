@@ -1,5 +1,11 @@
 OpenCms Module Developer Eclipse plug-in
 
+Release 0.0.6 -- to be released
+- merge code submission from lufam, which includes:
+  - communicate with OpenCms on finer grain than Project: now possible on file and folder level
+  - support for PLAIN type; files with extension .htm(l), .css, .js, .txt and .xsd are recognized as PLAIN type
+  - resources who's name start with a dot (.) or 'test' are not copied to OpenCms installation.
+
 Release 0.0.5 -- released on August 1, 2008
 - repair compatibility issue with OpenCms 7.0.5 (thanks to Stephan Schrader) -- Java 5 is now required!
 
@@ -25,5 +31,3 @@ Release 0.0.1 -- released on June 17, 2007
 - Use local OpenCms installation codebase (via Custom ClassLoader)
 - Change OpenCms classpath without restarting eclipse
 - Maintain preferences
-
-

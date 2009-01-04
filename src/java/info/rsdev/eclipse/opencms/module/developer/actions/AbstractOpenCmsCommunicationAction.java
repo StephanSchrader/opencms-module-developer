@@ -16,7 +16,7 @@ import info.rsdev.eclipse.opencms.module.developer.Messages;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
@@ -69,8 +69,8 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 							Iterator iterator = structuredSelection.iterator();
 							while (iterator.hasNext()) {
 								Object selectedItem = iterator.next();
-								if (selectedItem instanceof IProject) {
-									execute((IProject)selectedItem, communicator, progressMonitor);
+								if (selectedItem instanceof IResource) {
+									execute((IResource)selectedItem, communicator, progressMonitor);
 								}
 								progressMonitor.worked(1000);
 							}
@@ -96,7 +96,7 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 		}
 	}
 	
-	public abstract void execute(IProject project, ICommunicator communicator, IProgressMonitor progressMonitor) throws CoreException ;
+	public abstract void execute(IResource resource, ICommunicator communicator, IProgressMonitor progressMonitor) throws CoreException ;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
