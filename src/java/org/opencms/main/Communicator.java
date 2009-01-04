@@ -334,9 +334,9 @@ public class Communicator implements ICommunicator {
 						}
 						for (int i=0; i<remoteSubFolders.size(); i++) {
 							CmsResource remoteResource = (CmsResource)remoteSubFolders.get(i);
-							String remoteResourceName = remoteResource.getRootPath(); 
+							String remoteResourceName = remoteResource.getRootPath();
 							cms.lockResource(remoteResourceName);
-							cms.deleteResource(remoteResourceName, CmsResource.DELETE_PRESERVE_SIBLINGS);
+							CmsCompatibilityHelper.deleteResource(cms, remoteResource, remoteResourceName);
 						}
 					}
 				}
@@ -518,7 +518,7 @@ public class Communicator implements ICommunicator {
 				ExceptionUtils.throwCoreException(t);
 			}
 		}
-	}	
+	}
 
 	protected void publish(IProject javaProject, IProgressMonitor progressMonitor) throws CoreException {
 		//throw new UnsupportedOperationException("Publishing is not yet implemented");
@@ -848,7 +848,7 @@ public class Communicator implements ICommunicator {
 			CmsResource remoteResource = (CmsResource)remoteResources.get(i);
 			String remoteResourceName = remoteResource.getRootPath(); 
 			cms.lockResource(remoteResourceName);
-			cms.deleteResource(remoteResourceName, CmsResource.DELETE_PRESERVE_SIBLINGS);
+			CmsCompatibilityHelper.deleteResource(cms, remoteResource, remoteResourceName);
 		}
 	}
 	

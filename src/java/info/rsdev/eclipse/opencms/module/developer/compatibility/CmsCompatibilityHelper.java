@@ -11,9 +11,9 @@
 package info.rsdev.eclipse.opencms.module.developer.compatibility;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.opencms.file.CmsObject;
 import org.opencms.file.CmsResource;
 import org.opencms.main.CmsSystemInfo;
 
@@ -24,66 +24,76 @@ import org.opencms.main.CmsSystemInfo;
  */
 public class CmsCompatibilityHelper {
 	
-	/* (non-Javadoc)
-	 * @see info.rsdev.eclipse.opencms.module.developer.compatibility.ICmsResourceCompatibility#isChanged(org.opencms.file.CmsResource)
+	/**
+	 * In OpenCms 6.x, the state of a resource (new, changed, deleted etc.) is recorded through an int, in OpenCms 7,
+	 * the state is replaced with a CmsResourceState-object.
+	 * 
+	 * @param cmsResource The resource to check whether it has changed
+	 * @return false when the state of the resource is 'unchanged', true otherwise 
 	 */
 	public static boolean isChanged(CmsResource cmsResource) {
 		try {
 			Method getStateMethod = cmsResource.getClass().getMethod("getState", new Class[] {});
-			Object returnValue = getStateMethod.invoke(cmsResource, new Object[] {});
+			Object stateObject = getStateMethod.invoke(cmsResource, new Object[] {});
 			Field changedState = cmsResource.getClass().getDeclaredField("STATE_UNCHANGED");
-			return !returnValue.equals(changedState.get(cmsResource));
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
+			return !stateObject.equals(changedState.get(cmsResource));
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see info.rsdev.eclipse.opencms.module.developer.compatibility.ICmsResourceCompatibility#isDeleted(org.opencms.file.CmsResource)
+	/**
+	 * In OpenCms 6.x, the state of a resource (new, changed, deleted etc.) is recorded through an int, in OpenCms 7.x,
+	 * the state is replaced with a CmsResourceState-object.
+	 * 
+	 * @param cmsResource The resource to check whether it is deleted
+	 * @return true when the state of the resource is 'deleted', false otherwise 
 	 */
 	public static boolean isDeleted(CmsResource cmsResource) {
 		try {
 			Method getStateMethod = cmsResource.getClass().getMethod("getState", new Class[] {});
-			Object returnValue = getStateMethod.invoke(cmsResource, new Object[] {});
-			Field changedState = cmsResource.getClass().getDeclaredField("STATE_DELETED");
-			return returnValue.equals(changedState.get(cmsResource));
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
+			Object stateObject = getStateMethod.invoke(cmsResource, new Object[] {});
+			Field deletedState = cmsResource.getClass().getDeclaredField("STATE_DELETED");
+			return stateObject.equals(deletedState.get(cmsResource));
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	/**
+	 * Resources can have sibblings. When you delete a resource, you have to indicate in the delete method, 
+	 * what to do with these sibblings: preserve or delete them. In OpenCms 6.x, this was indicated with an 
+	 * int constant, in OpenCms 7, this is done with a CmsResourceDeleteMode-object.
+	 * 
+	 * @param cms The CmsObject to operate on
+	 * @param cmsResource The resource to delete
+	 */
+	public static void deleteResource(CmsObject cms, CmsResource cmsResource, String resourceName) {
+		try {
+			Field deleteSibblingConstant = cmsResource.getClass().getField("DELETE_PRESERVE_SIBLINGS");
+			Object deleteSibblingValue = deleteSibblingConstant.get(cmsResource);
+			
+			/* Delete method has two parameters, the name of the resource to delete and an indicator for
+			 * the type of deletion (either preserve or delete sibblings). The indicator type differs,
+			 * depending on which version of OpenCms is used.
+			 */
+			Class deleteSibblingValueType = null;
+			if (deleteSibblingValue.getClass().equals(Integer.class)) {
+				deleteSibblingValueType = int.class;
+			} else {
+				deleteSibblingValueType = deleteSibblingValue.getClass();
+			}
+			Method deleteMethod =  cms.getClass().getMethod("deleteResource", String.class, deleteSibblingValueType);
+			//String resourceName = cmsResource.getRootPath();
+			deleteMethod.invoke(cms, new Object[] {resourceName, deleteSibblingValue});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -115,7 +125,7 @@ public class CmsCompatibilityHelper {
 				//We are dealing with OpenCms 7.0.3 or earlier
 				parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName};
 			} else if (parameterTypes.length == 5) {
-				//We are dealing with OpenCms 7.0.4 or later
+				//We are dealing with OpenCms 7.0.4
 				String servletContainerName = null;	//not relevant, since we are running outside container
 				parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName, servletContainerName};
 			} else if (parameterTypes.length == 6) {
@@ -128,13 +138,7 @@ public class CmsCompatibilityHelper {
 			try {
 				initMethod.setAccessible(true);	//the init-method is protected
 				initMethod.invoke(systemInfo, parameterValues);
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
