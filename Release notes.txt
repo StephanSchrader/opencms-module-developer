@@ -1,6 +1,6 @@
 OpenCms Module Developer Eclipse plug-in
 
-Release 0.0.6 -- to be released in January 2009
+Release 0.0.6 -- released on January 5, 2009
 - merge code submission from lufam, which includes:
   - communicate with OpenCms on finer grain than Project: now possible on file and folder level
   - support for PLAIN type; files with extension .htm(l), .css, .js, .txt and .xsd are recognized as PLAIN type
