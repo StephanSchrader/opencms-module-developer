@@ -10,6 +10,7 @@
  */
 package info.rsdev.eclipse.opencms.module.developer.compatibility;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -118,7 +119,6 @@ public class CmsCompatibilityHelper {
 		if (initMethod != null) {
 			parameterTypes = initMethod.getParameterTypes();
 		}
-		
 		if (parameterTypes != null) {
 			Object[] parameterValues = null;
 			if (parameterTypes.length == 4) {
@@ -129,10 +129,26 @@ public class CmsCompatibilityHelper {
 				String servletContainerName = null;	//not relevant, since we are running outside container
 				parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName, servletContainerName};
 			} else if (parameterTypes.length == 6) {
-			    //We are dealing with OpenCms 7.0.5 or later
+			    //We are dealing with OpenCms 7.0.5 
 			    String servletContainerName = null;    //not relevant, since we are running outside container
 			    Boolean throwException = Boolean.TRUE;
 			    parameterValues = new Object[] { webinfLocation, servletMapping, null, webappName, servletContainerName, throwException };
+			} else if(parameterTypes.length == 1) {
+				//We are dealing with OpenCms 7.5.1
+				String defaultWebApplication = "ROOT"; 
+				String servletContainerName = null;  //not relevant, since we are running outside container
+				String webApplicationContext = null; //calculated from the path
+				Object[] constructorParameterValues = 
+					new Object[] { webinfLocation, defaultWebApplication, servletMapping, servletContainerName, webApplicationContext};
+				try {
+					Class[] parameterTypesForConstructor = {String.class,String.class,String.class,String.class,String.class};
+					Constructor constructor = parameterTypes[0].getDeclaredConstructor(parameterTypesForConstructor);
+					constructor.setAccessible(true);
+					parameterValues = new Object[] {constructor.newInstance(constructorParameterValues)};
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			try {

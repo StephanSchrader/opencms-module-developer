@@ -1,5 +1,8 @@
 OpenCms Module Developer Eclipse plug-in
 
+Release 0.0.7 -- released on November 11, 2009
+- add support for OpenCms 7.5.1 (patch submitted by José Ángel García)
+
 Release 0.0.6 -- released on January 5, 2009
 - merge code submission from lufam, which includes:
   - communicate with OpenCms on finer grain than Project: now possible on file and folder level
