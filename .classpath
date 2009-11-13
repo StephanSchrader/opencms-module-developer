@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/runtime/OpenCms705/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/runtime/OpenCms705/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/runtime/OpenCms705/opencms.jar"/>
+	<classpathentry kind="lib" path="lib/runtime/servlet-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
