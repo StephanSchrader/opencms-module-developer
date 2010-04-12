@@ -1,5 +1,11 @@
 OpenCms Module Developer Eclipse plug-in
 
+Release 0.0.8 -- to be released
+- add OpenCms source file locations to preferences, so that you can jump to sources by 'Open Declaration' 
+        (patch submitted by Dirk Lembke on March 30, 2010)
+- Export wizard now ends without error, so no manual corrections are needed anymore when building the plugin
+        (patch submitted by Dirk Lembke on March 30, 2010)
+
 Release 0.0.7 -- released on November 26, 2009
 - add support for OpenCms 7.5.1 (patch submitted by José Ángel García)
 

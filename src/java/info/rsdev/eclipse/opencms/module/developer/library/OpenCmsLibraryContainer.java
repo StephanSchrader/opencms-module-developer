@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
@@ -40,6 +42,8 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 	private IPath containerPath = null;
 	
 	private File webinfLibLocation = null;
+
+	private File openCmsSourceLocation = null;
 	
 	private File webinfClassesLocation = null;
 	
@@ -55,6 +59,11 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 		//also add additional jars to the Library container
 		String additionalJars = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_ADDITIONAL_JARS);
 		this.additionalJars = getFileEntries(additionalJars);
+
+		//also add additional jars to the Library container
+		String openCmsSourceLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SRC_DIR);
+		this.setOpenCmsSourceLocation(openCmsSourceLocation);
+		
 		
 		this.containerPath = containerPath;
 		this.classpath = generateClasspath();
@@ -86,7 +95,7 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 	}
 	
 	private IClasspathEntry[] generateClasspath() {
-		Vector entries = new Vector();
+		Vector<IClasspathEntry> entries = new Vector<IClasspathEntry>();
 		try {
 			//add classes directory to the classpath -- doesn't seem to accept classes folder outside the workspace
 //			if (webinfClassesLocation.exists()) {
@@ -109,8 +118,12 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 				for (int i = 0; i < files.length; i++) {
 					File file = files[i];
 					if (file.exists()) {
-						IPath filePath = new Path(file.getAbsolutePath());
-						entries.add(JavaCore.newLibraryEntry(filePath, null, null));
+						String filename = file.getName();
+						String path = file.getAbsolutePath();
+						if (openCmsSourceLocation!=null &&  (filename.startsWith("org.opencms") || (filename.startsWith("opencms"))))
+							entries.add(JavaCore.newLibraryEntry(new Path(path), new Path(openCmsSourceLocation.getAbsolutePath()), null));
+						else
+							entries.add(JavaCore.newLibraryEntry(new Path(path), null, null));
 					}
 				}
 			}
@@ -127,6 +140,14 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 		}
+		
+		Collections.sort(entries, new Comparator<IClasspathEntry>() {
+			public int compare(IClasspathEntry e1, IClasspathEntry e2) {
+				return e1.getPath().lastSegment().compareTo(e2.getPath().lastSegment());
+			}
+		});		
+		
+		
 		return (IClasspathEntry[]) entries.toArray(new IClasspathEntry[entries.size()]);
 	}
 
@@ -174,4 +195,13 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 		this.webinfClassesLocation = null;
 	}
 
+	public void setOpenCmsSourceLocation(String newDir) {
+		File srcLocation = new File(newDir);
+		if (srcLocation.exists()) 
+		{	
+			this.openCmsSourceLocation = srcLocation;
+		}
+	}
+	
+	
 }

@@ -20,6 +20,7 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
 	public static String preferences_webinf_dir;
+	public static String preferences_src_dir;
 	public static String preferences_additional_jars;
 	public static String preferences_select_additional_jars;
 	public static String preferences_keep_alive;

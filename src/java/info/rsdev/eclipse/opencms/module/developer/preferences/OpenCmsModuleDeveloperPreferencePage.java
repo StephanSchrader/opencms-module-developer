@@ -34,6 +34,8 @@ public class OpenCmsModuleDeveloperPreferencePage extends FieldEditorPreferenceP
 		IWorkbenchPreferencePage {
 	
 	public static final String OPENCMS_WEBINF_DIR = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsWebInfDir"; //$NON-NLS-1$
+
+	public static final String OPENCMS_SRC_DIR = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsSrcDir"; //$NON-NLS-1$
 	
 	public static final String OPENCMS_ADDITIONAL_JARS = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsAdditionalJars";
 	
@@ -83,6 +85,8 @@ public class OpenCmsModuleDeveloperPreferencePage extends FieldEditorPreferenceP
 	protected void createFieldEditors() {
 		DirectoryFieldEditor webinfDirEditor = new DirectoryFieldEditor(OPENCMS_WEBINF_DIR, Messages.preferences_webinf_dir, getFieldEditorParent());
 		addField(webinfDirEditor);
+		DirectoryFieldEditor srcDirEditor = new DirectoryFieldEditor(OPENCMS_SRC_DIR, Messages.preferences_src_dir, getFieldEditorParent());
+		addField(srcDirEditor);
 		ListEditor additionalJarsEditor = new FileListEditor(OPENCMS_ADDITIONAL_JARS, Messages.preferences_additional_jars, Messages.preferences_select_additional_jars, getFieldEditorParent());
 		addField(additionalJarsEditor);
 //		BooleanFieldEditor keepAliveEditor = new BooleanFieldEditor(OPENCMS_KEEP_ALIVE, Messages.preferences_keep_alive, getFieldEditorParent());
