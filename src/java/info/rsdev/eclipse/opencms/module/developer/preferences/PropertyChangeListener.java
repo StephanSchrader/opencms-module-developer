@@ -22,7 +22,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 
 public class PropertyChangeListener implements IPropertyChangeListener {
 	
-	private Map actions = new HashMap();
+	private Map<String, PreferenceChangedAction> actions = new HashMap<String, PreferenceChangedAction>();
 	
 	public PropertyChangeListener() {
 		//register the actions that must be executed when a certain preference changes

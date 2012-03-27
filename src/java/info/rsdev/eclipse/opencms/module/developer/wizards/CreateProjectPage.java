@@ -87,7 +87,8 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 		buildUserInterface();
 	}
 	
-	private void buildUserInterface() {
+	@SuppressWarnings("unused")
+    private void buildUserInterface() {
 		
 		if ((container != null) && (!container.isDisposed())) {
 			container.dispose();
@@ -177,7 +178,7 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 		    fetchModulesButton.setToolTipText(Messages.wizard_tooltip_fetchmodules);
 		    fetchModulesButton.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
-					final List moduleNames = new ArrayList();
+					final List<String> moduleNames = new ArrayList<String>();
 					String moduleName = moduleNameCombo.getText();
 					ICommunicator communicator = null;
 					try {
@@ -189,7 +190,7 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 									
 									ICommunicator communicator = null;
 									
-									public void run(IProgressMonitor progressMonitor) throws InvocationTargetException {
+                                    public void run(IProgressMonitor progressMonitor) throws InvocationTargetException {
 										
 										/* Setup the progress monitor: 5000 units of work for connecting to OpenCms
 										 * and 1000 units of work for fetching the modules
@@ -320,10 +321,11 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 		setControl(null);
 	}
 
-	public void setWidgetValues() {
+	@SuppressWarnings("unused")
+    public void setWidgetValues() {
 	    importIndicatorButton.setSelection(importIndicator);
 	    if (true /*importIndicator*/) {
-	    	List items = Arrays.asList(moduleNameCombo.getItems());
+	    	List<String> items = Arrays.asList(moduleNameCombo.getItems());
 	    	if ((items != null) && (items.size() > 0)) {
 		    	int selectionIndex = items.indexOf(descriptor.getModuleName());
 		    	moduleNameCombo.select(selectionIndex);
@@ -341,7 +343,8 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 	    createSource.setSelection(descriptor.isCreateSourceFolder());
 	}
 	
-	public void getWidgetValues() {
+	@SuppressWarnings("unused")
+    public void getWidgetValues() {
 	    descriptor.setImportModule(importIndicatorButton.getSelection());
 	    if (true /*importIndicator*/) {
 	    	String moduleName = moduleNameCombo.getText();
@@ -367,8 +370,8 @@ public class CreateProjectPage extends WizardPage implements IExchanger {
 	    }
 	}
 	
-	protected List getModules() {
-		List moduleNames = null;
+	protected List<String> getModules() {
+		List<String> moduleNames = null;
 		ICommunicator communicator = null;
 		try {
 			if (CommunicatorUtils.isProperlyConfigured()) {

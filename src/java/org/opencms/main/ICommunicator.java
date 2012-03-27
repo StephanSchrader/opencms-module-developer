@@ -34,6 +34,6 @@ public interface ICommunicator {
 
 	public void publish(IResource resource, IProgressMonitor progressMonitor) throws CoreException;
 
-	public List getModules(IProgressMonitor progressMonitor) throws CoreException;
+	public List<String> getModules(IProgressMonitor progressMonitor) throws CoreException;
 
 }

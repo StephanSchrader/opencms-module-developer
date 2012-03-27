@@ -28,7 +28,7 @@ public class OpenCmsConstants {
 	public static final int OPENCMS_TYPE_BINARY = 2;
 	public static final int OPENCMS_TYPE_IMAGE = 3;
 	
-	public static final Map OPENCMS_TYPE_MAPPING = new HashMap();
+	public static final Map<String, Integer> OPENCMS_TYPE_MAPPING = new HashMap<String, Integer>(21);
 	static {
 		OPENCMS_TYPE_MAPPING.put("txt", new Integer(OPENCMS_TYPE_PLAIN));
 		OPENCMS_TYPE_MAPPING.put("css", new Integer(OPENCMS_TYPE_PLAIN));
@@ -53,7 +53,7 @@ public class OpenCmsConstants {
 		OPENCMS_TYPE_MAPPING.put("tiff", new Integer(OPENCMS_TYPE_IMAGE));
 	}
 	
-	public static final Map OPENCMS_EXTENSION_MAPPING = new HashMap();
+	public static final Map<Integer, String> OPENCMS_EXTENSION_MAPPING = new HashMap<Integer, String>(3);
 	static {
 		OPENCMS_EXTENSION_MAPPING.put(new Integer(OpenCmsConstants.OPENCMS_TYPE_JSP), "jsp");
 		OPENCMS_EXTENSION_MAPPING.put(new Integer(OpenCmsConstants.OPENCMS_TYPE_XMLPAGE), "xml");

@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import org.opencms.file.CmsObject;
 import org.opencms.file.CmsResource;
 import org.opencms.main.CmsSystemInfo;
+import org.opencms.main.OpenCmsCore;
 
 /**
  * This class is used to provide a bridge between incompatible OpenCms versions
@@ -39,7 +40,6 @@ public class CmsCompatibilityHelper {
 			Field changedState = cmsResource.getClass().getDeclaredField("STATE_UNCHANGED");
 			return !stateObject.equals(changedState.get(cmsResource));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
@@ -59,7 +59,6 @@ public class CmsCompatibilityHelper {
 			Field deletedState = cmsResource.getClass().getDeclaredField("STATE_DELETED");
 			return stateObject.equals(deletedState.get(cmsResource));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
@@ -82,7 +81,7 @@ public class CmsCompatibilityHelper {
 			 * the type of deletion (either preserve or delete sibblings). The indicator type differs,
 			 * depending on which version of OpenCms is used.
 			 */
-			Class deleteSibblingValueType = null;
+			Class<?> deleteSibblingValueType = null;
 			if (deleteSibblingValue.getClass().equals(Integer.class)) {
 				deleteSibblingValueType = int.class;
 			} else {
@@ -92,7 +91,6 @@ public class CmsCompatibilityHelper {
 			//String resourceName = cmsResource.getRootPath();
 			deleteMethod.invoke(cms, new Object[] {resourceName, deleteSibblingValue});
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -113,9 +111,9 @@ public class CmsCompatibilityHelper {
 	 * 
 	 * @param systemInfo
 	 */
-	public static void initCmsSystemInfo(CmsSystemInfo systemInfo, String webinfLocation, String servletMapping, String webappName) {
+    public static void initCmsSystemInfo(CmsSystemInfo systemInfo, String webinfLocation, String servletMapping, String webappName) {
 		Method initMethod = findUniqueMethod("init", systemInfo.getClass().getDeclaredMethods());
-		Class[] parameterTypes = null;
+		Class<?>[] parameterTypes = null;
 		if (initMethod != null) {
 			parameterTypes = initMethod.getParameterTypes();
 		}
@@ -141,12 +139,11 @@ public class CmsCompatibilityHelper {
 				Object[] constructorParameterValues = 
 					new Object[] { webinfLocation, defaultWebApplication, servletMapping, servletContainerName, webApplicationContext};
 				try {
-					Class[] parameterTypesForConstructor = {String.class,String.class,String.class,String.class,String.class};
-					Constructor constructor = parameterTypes[0].getDeclaredConstructor(parameterTypesForConstructor);
+					Class<?>[] parameterTypesForConstructor = {String.class,String.class,String.class,String.class,String.class};
+					Constructor<?> constructor = parameterTypes[0].getDeclaredConstructor(parameterTypesForConstructor);
 					constructor.setAccessible(true);
 					parameterValues = new Object[] {constructor.newInstance(constructorParameterValues)};
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -155,10 +152,42 @@ public class CmsCompatibilityHelper {
 				initMethod.setAccessible(true);	//the init-method is protected
 				initMethod.invoke(systemInfo, parameterValues);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	/**
+	 * As of OpenCms 8.0.x, upgrading the OpenCms runlevel now requires CmsParameterConfiguration. Prior versions used
+	 * ExtendedProperties. We need to determine which class exists runtime and call the OpenCmsCore#upgradeRunlevel method
+	 * with the correct parameter type.
+	 * 
+	 * @param opencms the OpenCms instance
+	 * @param cmsPropertyPath the path where the properties are located
+	 */
+	public static void upgradeRunlevel(OpenCmsCore opencms, String cmsPropertyPath) {
+	    Object propertyContainer = null;
+	    try {
+    	    try {
+    	        Class<?> cmsParameterConfiguration = Class.forName("org.opencms.configuration.CmsParameterConfiguration"); //call constructor
+    	        Constructor<?> cmsParamConfigConstructor = cmsParameterConfiguration.getDeclaredConstructor(String.class);
+    	        propertyContainer = cmsParamConfigConstructor.newInstance(cmsPropertyPath);
+    	    } catch (ClassNotFoundException ex) {
+    	        //when class CmsParameterConfiguration is unknown, we are working with OpenCms prior to 8.0.2
+    	        Class<?> cmsPropertyUtils = Class.forName("org.opencms.util.CmsPropertyUtils"); //call loadProperties
+    	        Method loadMethod = findUniqueMethod("loadProperties", cmsPropertyUtils.getDeclaredMethods());
+    	        propertyContainer = loadMethod.invoke(null, cmsPropertyPath);  //call static method
+    	    }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+	    Method upgradeMethod = findUniqueMethod("upgradeRunlevel", OpenCmsCore.class.getDeclaredMethods());
+	    try {
+            upgradeMethod.invoke(opencms, propertyContainer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 	
 	/**

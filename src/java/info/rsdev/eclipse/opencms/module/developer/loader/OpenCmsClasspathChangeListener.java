@@ -20,5 +20,5 @@ public interface OpenCmsClasspathChangeListener {
 
 	public void changeWebInfLocation(String oldDir, String newDir);
 	
-	public void changeAdditionalJars(List oldJars, List newJars);
+	public void changeAdditionalJars(List<String> oldJars, List<String> newJars);
 }

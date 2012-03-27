@@ -66,7 +66,8 @@ public abstract class AbstractOpenCmsCommunicationAction implements IObjectActio
 							/* iterate over the selected projects and execute the action of the subclass 
 							 * implementeation on each project
 							 */
-							Iterator iterator = structuredSelection.iterator();
+							@SuppressWarnings("unchecked")
+                            Iterator<Object> iterator = structuredSelection.iterator();
 							while (iterator.hasNext()) {
 								Object selectedItem = iterator.next();
 								if (selectedItem instanceof IResource) {

@@ -39,8 +39,8 @@ public class OpenCmsClassLoader extends ClassLoader
 		super(OpenCmsClassLoader.class.getClassLoader());
 	}
 	
-	protected Class findClass(String className) throws ClassNotFoundException {
-		Class target = null;
+	protected Class<?> findClass(String className) throws ClassNotFoundException {
+		Class<?> target = null;
 		
 		byte[] classBytes = null;
 		if ("org.opencms.main.Communicator".equals(className)) {
@@ -80,21 +80,10 @@ public class OpenCmsClassLoader extends ClassLoader
 		return openCmsClasspathManager.getResourceURL(resourceName);
 	}
 	
-//	public InputStream getResourceAsStream(String name) {
-//		System.out.println("OpenCmsClassLoader: Delegating getResourceAsStream to parent classloader: "+name);
-//		return super.getResourceAsStream(name);
-//	}
-//	
-//	public URL getResource(String name) {
-//		
-//		System.out.println("OpenCmsClassLoader: Delegating getResource to parent classloader: "+name);
-//		return super.getResource(name);
-//	}
-//	
-	public Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
+	public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 		
 		// First, check if this classloader can resolve  class has already been loaded
-		Class c = findLoadedClass(name);
+		Class<?> c = findLoadedClass(name);
 		if (c == null) {
 			if ("org.opencms.main.Communicator".equals(name)) {
 				c = findClass(name);

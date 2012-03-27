@@ -102,7 +102,6 @@ public class ExceptionUtils {
 	private static IStatus transform(Throwable t) {
 		if (t == null) { return null; }
 		
-		IStatus status = null;
 		if (hasCause(t)) {
 			MultiStatus multiStatus = new MultiStatus(OpenCmsModuleDeveloperPlugin.PLUGIN_ID, Status.ERROR, t.toString(), t);
 			multiStatus.add(transform(t.getCause()));

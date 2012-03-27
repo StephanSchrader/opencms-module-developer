@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.JavaCore;
  * @author Dave Schoorl
  *
  */
+@SuppressWarnings("deprecation")
 public class OpenCmsLibraryContainer implements IClasspathContainer {
 	
 	public static final String CONTAINER_ID = "OpenCmsLibLocation";
@@ -45,13 +46,14 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 
 	private File openCmsSourceLocation = null;
 	
-	private File webinfClassesLocation = null;
+	@SuppressWarnings("unused")
+    private File webinfClassesLocation = null;
 	
 	private File[] additionalJars = null;
 	
 	private IClasspathEntry[] classpath = null;
 
-	public OpenCmsLibraryContainer(IPath containerPath) throws CoreException {
+    public OpenCmsLibraryContainer(IPath containerPath) throws CoreException {
 		Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
 		String webinfLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
 		this.setWebInfLocation(webinfLocation);
@@ -71,7 +73,7 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 	
 	private File[] getFileEntries(String additionalJars) {
 		
-		List additionalJarList = null;
+		List<String> additionalJarList = null;
 		if ((additionalJars != null) && (additionalJars.length() > 0)) {
 			additionalJarList = Arrays.asList(additionalJars.split("\\?"));
 		}
@@ -79,8 +81,8 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 		return getFileEntries(additionalJarList);
 	}
 
-	private File[] getFileEntries(List fileNames) {
-		List fileList = new ArrayList();
+	private File[] getFileEntries(List<String> fileNames) {
+		List<File> fileList = new ArrayList<File>();
 		
 		if (fileNames != null) {
 			for (int i=0; i<fileNames.size(); i++) {
@@ -167,7 +169,7 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 		return containerPath;
 	}
 
-	public void changeAdditionalJars(List oldJars, List newJars) {
+	public void changeAdditionalJars(List<String> oldJars, List<String> newJars) {
 		this.additionalJars = getFileEntries(newJars);
 	}
 

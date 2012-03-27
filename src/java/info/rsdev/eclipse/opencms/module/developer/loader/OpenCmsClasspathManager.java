@@ -45,11 +45,16 @@ import org.eclipse.core.runtime.Preferences;
  * 
  * @author Dave Schoorl
  */
+@SuppressWarnings("deprecation")
 public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 {
 	private static final OpenCmsClasspathManager instance = new OpenCmsClasspathManager();
 	
-	private Map availableClasspathFiles = null;
+	/**
+	 * Map {@link File} instances to their {@link Manifest}. When the {@link File} is a directory, the manifest
+	 * is a dummy (String). For files, value is a {@link Manifest}.
+	 */
+	private Map<File, Object> availableClasspathFiles = null;
 	
 	/* The jar file that most recently provided a classfile. Assume that this jar
 	 * is the most likely candidate to provide the next requested jar.
@@ -64,7 +69,7 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		this.changeWebInfLocation(null, openCmsWebInfLocation);
 		
 		//Make all additionally configured Jar-entries from the preferences available to the OpenCmsClasspathManager
-		List classpathEntries = new ArrayList();
+		List<File> classpathEntries = new ArrayList<File>();
 		String additionalEntries = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_ADDITIONAL_JARS);
 		if ((additionalEntries != null) && (additionalEntries.length() > 0)) {
 			String[] entries = additionalEntries.split("\\?");
@@ -86,14 +91,14 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		return instance;
 	}
 	
-	public void addToClasspath(List files) {
+	public void addToClasspath(List<File> files) {
 		if (files == null) { return; }
 		if (availableClasspathFiles == null) {
-			availableClasspathFiles = new HashMap(files.size());
+			availableClasspathFiles = new HashMap<File, Object>(files.size());
 		}
 		
 		for (int i=0;i<files.size(); i++) {
-			File file = (File)files.get(i);
+			File file = files.get(i);
 			if (file.exists()) {
 				/* the value in the HashMap will be the jar files' Manifest, but this is 
 				 * only set when the first class from that jarfile is loaded.
@@ -106,14 +111,14 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		}
 	}
 	
-	public void removeFromClasspath(List files) {
+	public void removeFromClasspath(List<File> files) {
 		if ((availableClasspathFiles == null) || (files == null)) {
 			return;
 		}
 		
 		boolean invalidateClassLoader = false;
 		for (int i=0;i<files.size(); i++) {
-			File file = (File)files.get(i);
+			File file = files.get(i);
 			if (availableClasspathFiles.containsKey(file)) {
 				
 				//Are classes loaded from this jarfile?
@@ -148,7 +153,7 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 				resourceURL = getResourceURL(resourceName, previousFileUsed);
 			} catch (IOException e) {
 				//problems reading jar file: remove jar file from list of available jars
-				List removeList = new ArrayList();
+				List<File> removeList = new ArrayList<File>();
 				removeList.add(previousFileUsed);
 				removeFromClasspath(removeList);
 				previousFileUsed = null;
@@ -158,10 +163,10 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		//If not found in the previously successfully used jar file, then search the other jar files 
 		if (resourceURL == null) {
 			File file = null;
-			Iterator fileIterator = availableClasspathFiles.keySet().iterator();
+			Iterator<File> fileIterator = availableClasspathFiles.keySet().iterator();
 			try {
 				while ((fileIterator.hasNext()) && (resourceURL == null)) {
-					file = (File)fileIterator.next();
+					file = fileIterator.next();
 					if (file.equals(previousFileUsed) == false) {
 						resourceURL = getResourceURL(resourceName, file);
 					}
@@ -244,7 +249,7 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		//If not found in the previously successfully used jar file, then search the other jar files 
 		if (result == null) {
 			File jarFile = null;
-			Iterator jarIterator = availableClasspathFiles.keySet().iterator();
+			Iterator<File> jarIterator = availableClasspathFiles.keySet().iterator();
 			try {
 				while ((jarIterator.hasNext()) && (result == null)) {
 					jarFile = (File)jarIterator.next();
@@ -325,10 +330,8 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 			int bufferSize = 1000 * 41;
 			byte[] buffer = new byte[bufferSize];
 			classReader = new ByteArrayOutputStream(bufferSize);
-			int totalBytesRead = 0;
 			int bufferRead = 0;
 			while ((bufferRead = stream.read(buffer,0,bufferSize)) >= 0) {
-				totalBytesRead += bufferRead;
 				classReader.write(buffer, 0, bufferRead);
 			}
 			classReader.flush();
@@ -347,10 +350,10 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 	public void changeWebInfLocation(String oldDir, String newDir) {
 		//first remove the entries contributed from the old WEB-INF dir
 		if ((oldDir != null) && (oldDir.length() > 0) && (availableClasspathFiles != null)) {
-			List removeClasspathEntries = new ArrayList();
-			Iterator fileIterator = availableClasspathFiles.keySet().iterator();
+			List<File> removeClasspathEntries = new ArrayList<File>();
+			Iterator<File> fileIterator = availableClasspathFiles.keySet().iterator();
 			while (fileIterator.hasNext()) {
-				File file = (File)fileIterator.next();
+				File file = fileIterator.next();
 				String fileName = file.getPath();
 				if (fileName.startsWith(oldDir)) {
 					removeClasspathEntries.add(file);
@@ -365,7 +368,7 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 				File openCmsWebInfDir = new File(newDir);
 				if (openCmsWebInfDir.exists() && openCmsWebInfDir.isDirectory()) {
 					File openCmsLibDir = new File(openCmsWebInfDir, "lib");
-					List fileList = new ArrayList();
+					List<File> fileList = new ArrayList<File>();
 					if (openCmsLibDir.exists() && openCmsLibDir.isDirectory()) {
 						File[] files = openCmsLibDir.listFiles(new FilenameFilter() {
 							public boolean accept(File dir, String name) {
@@ -394,12 +397,12 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		}
 	}
 	
-	public void changeAdditionalJars(List oldJars, List newJars) {
+	public void changeAdditionalJars(List<String> oldJars, List<String> newJars) {
 		
 		//determine which jars need to be deleted -- those that are present in oldJars, but not in newJars
-		List removeJars = new ArrayList();	//list of File-objects that need to be removed from the OpenCmsClasspath
+		List<File> removeJars = new ArrayList<File>();	//list of File-objects that need to be removed from the OpenCmsClasspath
 		if (oldJars != null) {
-			Iterator oldJarIterator = oldJars.iterator();
+			Iterator<String> oldJarIterator = oldJars.iterator();
 			while (oldJarIterator.hasNext()) {
 				String fileName = (String)oldJarIterator.next();
 				if (newJars.contains(fileName) == false) {
@@ -416,9 +419,9 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		}
 		
 		//determine which jars need to be added -- those that are present in newJars, but not in oldJars
-		List addJars = new ArrayList();	//list of File-objects that need to be added to the OpenCmsClasspath
+		List<File> addJars = new ArrayList<File>();	//list of File-objects that need to be added to the OpenCmsClasspath
 		if (newJars != null) {
-			Iterator newJarIterator = newJars.iterator();
+			Iterator<String> newJarIterator = newJars.iterator();
 			while (newJarIterator.hasNext()) {
 				String fileName = (String)newJarIterator.next();
 				if (oldJars.contains(fileName) == false) {

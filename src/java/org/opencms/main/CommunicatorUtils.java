@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Status;
  * @author Dave Schoorl
  *
  */
+@SuppressWarnings("deprecation")
 public class CommunicatorUtils {
 	
 	private CommunicatorUtils() {}
@@ -42,7 +43,7 @@ public class CommunicatorUtils {
 		currentThread.setContextClassLoader(openCmsLoader);
 		ICommunicator communicator = null;
 		try {
-			Class communicatorClass = Class.forName("org.opencms.main.Communicator", false, openCmsLoader);
+			Class<?> communicatorClass = Class.forName("org.opencms.main.Communicator", false, openCmsLoader);
 			Method instantiater = communicatorClass.getMethod("getInstance", new Class[] { IProgressMonitor.class });
 			communicator = (ICommunicator)instantiater.invoke(communicatorClass, new Object[]{ progressMonitor });
 		} catch (Throwable t) {
@@ -55,19 +56,19 @@ public class CommunicatorUtils {
 		return communicator;
 	}
 	
-	public static boolean isProperlyConfigured() throws CoreException {
+    public static boolean isProperlyConfigured() throws CoreException {
 		Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
 		boolean isProperlyConfigured = true;
 		
 		//The following preferences must have values in order to start OpenCms
-		List mandatoryPreferences = new ArrayList();
+		List<String> mandatoryPreferences = new ArrayList<String>();
 		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR));
 		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBAPP_NAME));
 		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SERVLET_MAPPING));
 		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_USERNAME));
 		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_PASSWORD));
 		
-		Iterator preferencesIterator = mandatoryPreferences.iterator();
+		Iterator<String> preferencesIterator = mandatoryPreferences.iterator();
 		while (preferencesIterator.hasNext() && isProperlyConfigured) {
 			String preference = (String)preferencesIterator.next();
 			if ((preference == null) || (preference.trim().length() == 0)) {
@@ -84,7 +85,7 @@ public class CommunicatorUtils {
 		return isProperlyConfigured;
 	}
 	
-	public static void close(ICommunicator communicator, boolean forceClose) {
+    public static void close(ICommunicator communicator, boolean forceClose) {
 		if (communicator != null) {
 			Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
 			boolean keepAlive = preferences.getBoolean(OpenCmsModuleDeveloperPreferencePage.OPENCMS_KEEP_ALIVE);

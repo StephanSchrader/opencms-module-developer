@@ -61,7 +61,8 @@ public class OpenCmsModuleDeveloperPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	protected void initializeDefaultPluginPreferences() {
+	@SuppressWarnings("deprecation")
+    protected void initializeDefaultPluginPreferences() {
 		//TODO: use new (default) preferences mechanism
 		super.initializeDefaultPluginPreferences();
 		getPluginPreferences().setDefault(OpenCmsModuleDeveloperPreferencePage.OPENCMS_MAKE_LIBRARY, true);

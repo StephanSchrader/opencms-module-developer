@@ -27,8 +27,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.ExtendedProperties;
-import org.apache.commons.logging.Log;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -46,12 +44,12 @@ import org.opencms.file.CmsFile;
 import org.opencms.file.CmsFolder;
 import org.opencms.file.CmsObject;
 import org.opencms.file.CmsProject;
+import org.opencms.file.CmsProperty;
 import org.opencms.file.CmsResource;
 import org.opencms.file.CmsResourceFilter;
 import org.opencms.lock.CmsLock;
 import org.opencms.module.CmsModule;
 import org.opencms.module.CmsModuleManager;
-import org.opencms.util.CmsPropertyUtils;
 import org.opencms.util.CmsStringUtil;
 
 /**
@@ -62,19 +60,18 @@ import org.opencms.util.CmsStringUtil;
  *
  * @author Dave Schoorl
  */
+@SuppressWarnings("deprecation")
 public class Communicator implements ICommunicator {
 	
 	private static final String PROJECT = "Offline";
 	
 	private static final String MODULES_ROOT_FOLDER = "/system/modules";
 	
-	private static String OPENCMS_ENCODING = "UTF-8";
-	
-	private static final Boolean isCommunicationInProgress = Boolean.FALSE;
+	@SuppressWarnings("unused")
+    private static String OPENCMS_ENCODING = "UTF-8";
 	
 	private static final String EMPTY_STRING = "";
 	
-	private static final Log LOG = CmsLog.getLog(Communicator.class);
 	private static ICommunicator instance;
 	private CmsObject cmso;
 
@@ -103,9 +100,6 @@ public class Communicator implements ICommunicator {
 				}
 				opencms = OpenCmsCore.getInstance();
 				CmsCompatibilityHelper.initCmsSystemInfo(opencms.getSystemInfo(), webinfLocation, servletMapping, webappName);
-				ExtendedProperties configuration = null;
-				String propertyPath = opencms.getSystemInfo().getConfigurationFileRfsPath();
-				configuration = CmsPropertyUtils.loadProperties(propertyPath);
 				if (progressMonitor != null) {
 					progressMonitor.worked(500);
 				}
@@ -115,31 +109,12 @@ public class Communicator implements ICommunicator {
 					progressMonitor.subTask(Messages.task_initialize_opencms);
 				}
 				
-//				Thread progressBarUpdateThread = new Thread(new Runnable() {
-//					
-//					private boolean initializationInProgress = true;
-//
-//					public void run() {
-//						try {
-//							while(initializationInProgress) {
-//								Display.getDefault().asyncExec(new Runnable() {
-//						               public void run() {
-//						            	   progressMonitor.worked(50);
-//						               }
-//						            });
-//								this.wait(500);
-//							}
-//						} catch (InterruptedException e) {
-//							initializationInProgress = false;
-//						}
-//					}
-//					
-//				});
-//				progressBarUpdateThread.start();
-				opencms = opencms.upgradeRunlevel(configuration);	//this is a longrunning operation when connection to OpenCms does not yet exist
+                String propertyPath = opencms.getSystemInfo().getConfigurationFileRfsPath();
+				CmsCompatibilityHelper.upgradeRunlevel(opencms, propertyPath);  //this is a longrunning operation when connection to OpenCms does not yet exist
 				if (progressMonitor != null) {
 					progressMonitor.worked(4000);
 				}
+				
 				//Stop the timer task. The longrunning operation has finished
 //				progressBarUpdateThread.interrupt();
 	
@@ -207,21 +182,21 @@ public class Communicator implements ICommunicator {
         this.cmso = null;
 	}
 	
-	public List getModules(IProgressMonitor progressMonitor) throws CoreException {
+	public List<String> getModules(IProgressMonitor progressMonitor) throws CoreException {
 		//Retrieve a list of installed modules
-		List installedModules = null;
+		List<String> installedModules = null;
 		if (installedModules == null) {
-			installedModules = new ArrayList();
+			installedModules = new ArrayList<String>();
 			CmsModuleManager moduleManager = OpenCms.getModuleManager();
 			installedModules.addAll(moduleManager.getModuleNames());
 			Collections.sort(installedModules);
 		}
 		
-		List installedModulesWithResources = new ArrayList();
+		List<String> installedModulesWithResources = new ArrayList<String>();
 		CmsObject cms = getCmsObject();
 		try {
 			//Retrieve a list of folders from /system/modules
-			List moduleFolders = cms.getSubFolders(MODULES_ROOT_FOLDER);
+			List<CmsResource> moduleFolders = cms.getSubFolders(MODULES_ROOT_FOLDER);
 			for (int i=0; i < moduleFolders.size(); i++) {
 				CmsFolder moduleFolder = (CmsFolder)moduleFolders.get(i);
 				String moduleName = moduleFolder.getName();
@@ -319,9 +294,9 @@ public class Communicator implements ICommunicator {
 				if (openCmsModuleFolder != null) {
 					IResource[] contents = javaProject.members();
 					if (contents != null) {
-						List remoteSubFolders = cms.getSubFolders(openCmsModuleFolder.getRootPath());
+						List<CmsResource> remoteSubFolders = cms.getSubFolders(openCmsModuleFolder.getRootPath());
 						if (remoteSubFolders == null) {
-							remoteSubFolders = new ArrayList();
+							remoteSubFolders = new ArrayList<CmsResource>();
 						}
 						for (int i=0; i < contents.length; i++) {
 							if (contents[i] instanceof IFolder) {
@@ -428,10 +403,10 @@ public class Communicator implements ICommunicator {
 					//download the module from the server and replace all local contents, 
 					//except for the src and classes directories.
 					String moduleFolderName = openCmsModuleFolder.getRootPath();
-					List remoteResources = cms.getResourcesInFolder(moduleFolderName, CmsResourceFilter.IGNORE_EXPIRATION);
-					Iterator remoteResourceIterator = remoteResources.iterator(); 
+					List<CmsResource> remoteResources = cms.getResourcesInFolder(moduleFolderName, CmsResourceFilter.IGNORE_EXPIRATION);
+					Iterator<CmsResource> remoteResourceIterator = remoteResources.iterator(); 
 					while (remoteResourceIterator.hasNext()) {
-						CmsResource remoteResource = (CmsResource)remoteResourceIterator.next();
+						CmsResource remoteResource = remoteResourceIterator.next();
 						if (remoteResource.isFolder()) {
 							String remoteResourceName = remoteResource.getName();
 							if (canDownloadFromServer(remoteResourceName)) {
@@ -594,15 +569,16 @@ public class Communicator implements ICommunicator {
         	 * compatible with openCms 6.x, therefore we currently still keep on using the deprecated  
         	 * OpenCms 6.x way. In the future this might be relocated to the CmsCompatibilityHelper-class.
         	 */
-//        	OpenCms.getPublishManager().publishResource(cms, parentFolderName);
-        	cms.publishResource(parentFolderName);
+            //TODO: move to CmsCompatibilityHelper-class
+        	OpenCms.getPublishManager().publishResource(cms, parentFolderName);
+//        	cms.publishResource(parentFolderName);
         }
         
         //search down the tree for more publishable resources
-        if ( !stateDeleted) {
-			List childResources = cms.getResourcesInFolder(parentFolderName, CmsResourceFilter.ALL);
+        if (!stateDeleted) {
+			List<CmsResource> childResources = cms.getResourcesInFolder(parentFolderName, CmsResourceFilter.ALL);
 			for (int i=0; i < childResources.size(); i++) {
-				CmsResource resource = (CmsResource)childResources.get(i);
+				CmsResource resource = childResources.get(i);
 				if (resource instanceof CmsFolder) {
 					publishFolder(cms, resource.getRootPath());
 				} else {
@@ -626,8 +602,9 @@ public class Communicator implements ICommunicator {
         	 * compatible with openCms 6.x, therefore we currently still keep on using the deprecated  
         	 * OpenCms 6.x way. In the future this might be relocated to the CmsCompatibilityHelper-class.
         	 */
-//        	OpenCms.getPublishManager().publishResource(cms, fileName);
-        	cms.publishResource(fileName);
+            //TODO: move to CmsCompatibilityHelper-class
+        	OpenCms.getPublishManager().publishResource(cms, fileName);
+//        	cms.publishResource(fileName);
         }
         
 	}
@@ -692,7 +669,7 @@ public class Communicator implements ICommunicator {
 
 	private String createRemoteFolder(CmsObject cms, String reconstructedPath) throws CmsException {
 		int folderTypeId = OpenCmsConstants.OPENCMS_TYPE_FOLDER;
-		List properties = new ArrayList();
+		List<CmsProperty> properties = new ArrayList<CmsProperty>();
 		CmsResource cmsFolder = cms.createResource(reconstructedPath, folderTypeId, new byte[0], properties);
 		return cmsFolder.getName();
 	}
@@ -711,7 +688,7 @@ public class Communicator implements ICommunicator {
 		String remoteFolderName = remoteFolder.getName();
 		IResource localResource = localParentFolder.findMember(remoteFolderName);
 		
-		List localSubFolderNames = new ArrayList();
+		List<String> localSubFolderNames = new ArrayList<String>();
 		IFolder localFolder = null;
 		if (localResource == null) {
 			//create folder in Eclipse workspace
@@ -739,9 +716,9 @@ public class Communicator implements ICommunicator {
 		
 		//Copy the remote folder's contents to Eclipse
 		String remotePath = remoteFolder.getRootPath();
-		List remoteFolderContents = cms.getResourcesInFolder(remotePath, CmsResourceFilter.DEFAULT);
+		List<CmsResource> remoteFolderContents = cms.getResourcesInFolder(remotePath, CmsResourceFilter.DEFAULT);
 		if (remoteFolderContents != null) {
-			Iterator folderContentIterator = remoteFolderContents.iterator();
+			Iterator<CmsResource> folderContentIterator = remoteFolderContents.iterator();
 			while (folderContentIterator.hasNext()) {
 				CmsResource remoteResource = (CmsResource)folderContentIterator.next();
 				if (remoteResource.isFile()) {
@@ -813,9 +790,9 @@ public class Communicator implements ICommunicator {
 		String remoteFolderName = remoteParentFolderName + localFolder.getName();
 		CmsFolder remoteFolder = getOpenCmsFolder(cms, remoteFolderName);	//TODO: remove OpenCms file that has the same name as the requested folder 
 		IResource[] localResources = localFolder.members();
-		List remoteResources = cms.getResourcesInFolder(remoteFolder.getRootPath(), CmsResourceFilter.DEFAULT);
+		List<CmsResource> remoteResources = cms.getResourcesInFolder(remoteFolder.getRootPath(), CmsResourceFilter.DEFAULT);
 		if (remoteResources == null) {
-			remoteResources = new ArrayList();
+			remoteResources = new ArrayList<CmsResource>();
 		}
 		
 		/* upload files -- replacing the file contents in OpenCms when it has a matching filename 
@@ -893,13 +870,13 @@ public class Communicator implements ICommunicator {
 	}
 	
 	
-	private CmsResource preserveOpenCmsCounterpart(IResource resource, List remoteResources) {
+	private CmsResource preserveOpenCmsCounterpart(IResource resource, List<CmsResource> remoteResources) {
 		CmsResource remoteResource = null;
 		String localResourceName = resource.getName(); 
 		
 		boolean hasCounterPart = false;
 		for (int i=0; ((i < remoteResources.size()) && (hasCounterPart == false)); i++) {
-			CmsResource cmsResource = (CmsResource)remoteResources.get(i);
+			CmsResource cmsResource = remoteResources.get(i);
 			int cmsType = cmsResource.getTypeId();
 			String remoteResourceName = cmsResource.getName();
 			if (cmsType != OpenCmsConstants.OPENCMS_TYPE_FOLDER) {

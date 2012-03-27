@@ -15,6 +15,9 @@ import info.rsdev.eclipse.opencms.module.developer.Messages;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opencms.file.types.I_CmsResourceType;
+import org.opencms.workplace.explorer.CmsExplorerTypeSettings;
+
 /**
  * This class holds the information that describes an OpenCms Module.
  * However, it has no dependencies on OpenCms code or types.
@@ -55,11 +58,11 @@ public class OpenCmsModuleDescriptor {
 	
 	private boolean createLibFolder = true;
 	
-	private List resourceTypes = new ArrayList();
+	private List<I_CmsResourceType> resourceTypes = new ArrayList<I_CmsResourceType>();
 	
-	private List explorerTypes = new ArrayList();
+	private List<CmsExplorerTypeSettings> explorerTypes = new ArrayList<CmsExplorerTypeSettings>();
 	
-	private List resources = null;
+//	private List resources = null;
 	
 	public OpenCmsModuleDescriptor() {}
 	
@@ -136,11 +139,11 @@ public class OpenCmsModuleDescriptor {
 		this.decription = decription;
 	}
 
-	public List getExplorerTypes() {
+	public List<CmsExplorerTypeSettings> getExplorerTypes() {
 		return explorerTypes;
 	}
 
-	public void setExplorerTypes(List explorerType) {
+	public void setExplorerTypes(List<CmsExplorerTypeSettings> explorerType) {
 		this.explorerTypes = explorerType;
 	}
 
@@ -179,19 +182,19 @@ public class OpenCmsModuleDescriptor {
 		this.niceName = niceName;
 	}
 
-	public List getResources() {
-		return resources;
-	}
+//	public List getResources() {
+//		return resources;
+//	}
+//
+//	public void setResources(List resources) {
+//		this.resources = resources;
+//	}
 
-	public void setResources(List resources) {
-		this.resources = resources;
-	}
-
-	public List getResourceTypes() {
+	public List<I_CmsResourceType> getResourceTypes() {
 		return resourceTypes;
 	}
 
-	public void setResourceTypes(List resourceTypes) {
+	public void setResourceTypes(List<I_CmsResourceType> resourceTypes) {
 		this.resourceTypes = resourceTypes;
 	}
 

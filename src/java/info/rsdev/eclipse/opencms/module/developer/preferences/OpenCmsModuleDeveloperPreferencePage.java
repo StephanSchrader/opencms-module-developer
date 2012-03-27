@@ -66,15 +66,14 @@ public class OpenCmsModuleDeveloperPreferencePage extends FieldEditorPreferenceP
 	 */
 	public OpenCmsModuleDeveloperPreferencePage(String title) {
 		this(title, null);
-		
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * @param title
 	 * @param image
 	 */
-	public OpenCmsModuleDeveloperPreferencePage(String title, ImageDescriptor image) {
+	@SuppressWarnings("deprecation")
+    public OpenCmsModuleDeveloperPreferencePage(String title, ImageDescriptor image) {
 		super(title, image, GRID);
 		preferences = new ScopedPreferenceStore(new InstanceScope(), OpenCmsModuleDeveloperPlugin.PLUGIN_ID);
 		setPreferenceStore(preferences);
@@ -115,10 +114,7 @@ public class OpenCmsModuleDeveloperPreferencePage extends FieldEditorPreferenceP
 		return super.performOk();
 	}
 
-	public void init(IWorkbench workbench) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void init(IWorkbench workbench) { }
 	
 	public void dispose() {
 		preferences.removePropertyChangeListener(propertyChangeListener);
