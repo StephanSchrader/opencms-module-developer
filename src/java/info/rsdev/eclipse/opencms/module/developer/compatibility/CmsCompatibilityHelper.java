@@ -174,7 +174,7 @@ public class CmsCompatibilityHelper {
 	    Object propertyContainer = null;
 	    try {
     	    try {
-    	        //the 8.x way
+    	        //the 8.0.2 and newer way
     	        Class<?> cmsParameterConfiguration = Class.forName("org.opencms.configuration.CmsParameterConfiguration", true, opencmsClassloader); //call constructor
     	        Constructor<?> cmsParamConfigConstructor = cmsParameterConfiguration.getDeclaredConstructor(String.class);
     	        propertyContainer = cmsParamConfigConstructor.newInstance(cmsPropertyPath);
