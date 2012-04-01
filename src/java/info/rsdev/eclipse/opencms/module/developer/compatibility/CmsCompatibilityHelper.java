@@ -181,7 +181,7 @@ public class CmsCompatibilityHelper {
     	    } catch (ClassNotFoundException ex) {
     	        //when class CmsParameterConfiguration is unknown, we are working with OpenCms prior to 8.0.2
     	        Class<?> cmsPropertyUtils = Class.forName("org.opencms.util.CmsPropertyUtils", true, opencmsClassloader); //call loadProperties
-    	        Method loadMethod = findUniqueMethod("loadProperties", cmsPropertyUtils.getDeclaredMethods());
+    	        Method loadMethod = cmsPropertyUtils.getDeclaredMethod("loadProperties", String.class);
     	        propertyContainer = loadMethod.invoke(null, cmsPropertyPath);  //call static method
     	    }
 	    } catch (Exception e) {
