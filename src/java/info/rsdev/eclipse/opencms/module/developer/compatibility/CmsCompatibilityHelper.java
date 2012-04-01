@@ -170,9 +170,7 @@ public class CmsCompatibilityHelper {
 	 * @param cmsPropertyPath the path where the properties are located
 	 */
 	public static void upgradeRunlevel(OpenCmsCore opencms, String cmsPropertyPath) {
-	    System.out.println("Reading system properties from: ".concat(cmsPropertyPath));
-	    Thread currentThread = Thread.currentThread();
-	    opencmsClassloader = currentThread.getContextClassLoader();
+	    opencmsClassloader = Thread.currentThread().getContextClassLoader();
 	    Object propertyContainer = null;
 	    try {
     	    try {
