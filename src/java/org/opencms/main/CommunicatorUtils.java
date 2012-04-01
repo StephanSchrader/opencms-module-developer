@@ -43,7 +43,7 @@ public class CommunicatorUtils {
 		currentThread.setContextClassLoader(openCmsLoader);
 		ICommunicator communicator = null;
 		try {
-			Class<?> communicatorClass = Class.forName("org.opencms.main.Communicator", false, openCmsLoader);
+			Class<?> communicatorClass = Class.forName("org.opencms.main.Communicator", true, openCmsLoader);
 			Method instantiater = communicatorClass.getMethod("getInstance", new Class[] { IProgressMonitor.class });
 			communicator = (ICommunicator)instantiater.invoke(communicatorClass, new Object[]{ progressMonitor });
 		} catch (Throwable t) {
@@ -94,6 +94,4 @@ public class CommunicatorUtils {
 			}
 		}
 	}
-
-
 }

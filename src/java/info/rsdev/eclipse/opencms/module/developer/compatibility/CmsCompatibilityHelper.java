@@ -12,7 +12,9 @@ package info.rsdev.eclipse.opencms.module.developer.compatibility;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import org.opencms.file.CmsObject;
 import org.opencms.file.CmsResource;
@@ -25,6 +27,8 @@ import org.opencms.main.OpenCmsCore;
  * @author Dave Schoorl
  */
 public class CmsCompatibilityHelper {
+    
+    private static ClassLoader opencmsClassloader = null;
 	
 	/**
 	 * In OpenCms 6.x, the state of a resource (new, changed, deleted etc.) is recorded through an int, in OpenCms 7,
@@ -166,30 +170,59 @@ public class CmsCompatibilityHelper {
 	 * @param cmsPropertyPath the path where the properties are located
 	 */
 	public static void upgradeRunlevel(OpenCmsCore opencms, String cmsPropertyPath) {
+	    System.out.println("Reading system properties from: ".concat(cmsPropertyPath));
+	    Thread currentThread = Thread.currentThread();
+	    opencmsClassloader = currentThread.getContextClassLoader();
 	    Object propertyContainer = null;
 	    try {
     	    try {
-    	        Class<?> cmsParameterConfiguration = Class.forName("org.opencms.configuration.CmsParameterConfiguration"); //call constructor
+    	        //the 8.x way
+    	        Class<?> cmsParameterConfiguration = Class.forName("org.opencms.configuration.CmsParameterConfiguration", true, opencmsClassloader); //call constructor
     	        Constructor<?> cmsParamConfigConstructor = cmsParameterConfiguration.getDeclaredConstructor(String.class);
     	        propertyContainer = cmsParamConfigConstructor.newInstance(cmsPropertyPath);
     	    } catch (ClassNotFoundException ex) {
     	        //when class CmsParameterConfiguration is unknown, we are working with OpenCms prior to 8.0.2
-    	        Class<?> cmsPropertyUtils = Class.forName("org.opencms.util.CmsPropertyUtils"); //call loadProperties
+    	        Class<?> cmsPropertyUtils = Class.forName("org.opencms.util.CmsPropertyUtils", true, opencmsClassloader); //call loadProperties
     	        Method loadMethod = findUniqueMethod("loadProperties", cmsPropertyUtils.getDeclaredMethods());
     	        propertyContainer = loadMethod.invoke(null, cmsPropertyPath);  //call static method
     	    }
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        throw new RuntimeException("Cannot upgrade Runlevel of OpenCms", e);
 	    }
 	    
-	    Method upgradeMethod = findUniqueMethod("upgradeRunlevel", OpenCmsCore.class.getDeclaredMethods());
-	    try {
-            upgradeMethod.invoke(opencms, propertyContainer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	    Method upgradeMethod = findUniqueMethod("upgradeRunlevel", opencms.getClass().getDeclaredMethods());
+	    if (propertyContainer != null) {
+    	    try {
+                upgradeMethod.invoke(opencms, propertyContainer);
+            } catch (Exception e) {
+                throw new RuntimeException("Cannot upgrade Runlevel of OpenCms", e);
+            }
+	    }
 	}
 	
+    /**
+     * <p>In OpenCms 6.x, publishing a resource is simply telling the resource to publish itself. As of OpenCms 7.x,
+     * a fancy, shiny new PublishManager is needed to publish the resource. As of OpenCms 8.x, the 6.x way is removed
+     * from the code.</p>
+     * TODO: monitor performance, because there is a lot of reflection going on when there are a lot of resources to publish
+     * @param cms the resource to publish
+     * @param parentFolderName the name of the folder the resource resides
+     * @throws Exception any exception that occurs is propagated
+     */
+    public static void publishResource(CmsObject cms, String parentFolderName) throws Exception {
+        Class<?> openCmsClass = Class.forName("org.opencms.main.OpenCms", true, opencmsClassloader);
+        Method getPublisherMethod = findUniqueMethod("getPublishManager", openCmsClass.getDeclaredMethods());
+        if (getPublisherMethod != null) {
+            Object publishManager = getPublisherMethod.invoke(null);  //call static method
+            Method publishMethod = findUniqueMethod("publishResource", publishManager.getClass().getDeclaredMethods());
+            publishMethod.invoke(publishManager, cms, parentFolderName);
+        } else {
+            //Publish 6.x style
+            Method publishMethod = findUniqueMethod("publishResource", cms.getClass().getDeclaredMethods());
+            publishMethod.invoke(cms, parentFolderName);
+        }
+    }
+
 	/**
 	 * From an array of methods, return the first one that matches the targetted method.
 	 * Only use this method when you know there can be only one. Only public Methods are
@@ -207,6 +240,12 @@ public class CmsCompatibilityHelper {
 					targetMethod = methods[i];
 				}
 			}
+		}
+		//Make sure we have access to the method
+		if (targetMethod != null) {
+	        if (!Modifier.isPublic(((Member)targetMethod).getModifiers()) || !Modifier.isPublic(((Member)targetMethod).getDeclaringClass().getModifiers())) {
+	            targetMethod.setAccessible(true);
+	        }
 		}
 		return targetMethod;
 	}

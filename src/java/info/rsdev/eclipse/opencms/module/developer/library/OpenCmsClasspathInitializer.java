@@ -31,9 +31,7 @@ public class OpenCmsClasspathInitializer extends ClasspathContainerInitializer {
 
 	private IClasspathContainer container;
 	
-	public OpenCmsClasspathInitializer() {
-		System.out.println("Initializing OpenCmsClasspathInitializer");
-	}
+	public OpenCmsClasspathInitializer() { }
 
 	public void initialize(IPath containerPath, IJavaProject project)
 			throws CoreException {

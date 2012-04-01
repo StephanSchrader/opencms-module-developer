@@ -565,13 +565,7 @@ public class Communicator implements ICommunicator {
         }
 
         if (stateChanged) {
-        	/* The commented code line below is the OpenCms 7.x way of publishing, but it is not
-        	 * compatible with openCms 6.x, therefore we currently still keep on using the deprecated  
-        	 * OpenCms 6.x way. In the future this might be relocated to the CmsCompatibilityHelper-class.
-        	 */
-            //TODO: move to CmsCompatibilityHelper-class
-        	OpenCms.getPublishManager().publishResource(cms, parentFolderName);
-//        	cms.publishResource(parentFolderName);
+            CmsCompatibilityHelper.publishResource(cms, parentFolderName);
         }
         
         //search down the tree for more publishable resources
@@ -598,13 +592,7 @@ public class Communicator implements ICommunicator {
         }
         
         if (stateChanged) {
-        	/* The commented code line below is the OpenCms 7.x way of publishing, but it is not
-        	 * compatible with openCms 6.x, therefore we currently still keep on using the deprecated  
-        	 * OpenCms 6.x way. In the future this might be relocated to the CmsCompatibilityHelper-class.
-        	 */
-            //TODO: move to CmsCompatibilityHelper-class
-        	OpenCms.getPublishManager().publishResource(cms, fileName);
-//        	cms.publishResource(fileName);
+            CmsCompatibilityHelper.publishResource(cms, fileName);
         }
         
 	}
