@@ -213,11 +213,11 @@ public class CmsCompatibilityHelper {
         Method getPublisherMethod = findUniqueMethod("getPublishManager", openCmsClass.getDeclaredMethods());
         if (getPublisherMethod != null) {
             Object publishManager = getPublisherMethod.invoke(null);  //call static method
-            Method publishMethod = findUniqueMethod("publishResource", publishManager.getClass().getDeclaredMethods());
+            Method publishMethod = publishManager.getClass().getDeclaredMethod("publishResource", cms.getClass(), String.class);
             publishMethod.invoke(publishManager, cms, parentFolderName);
         } else {
             //Publish 6.x style
-            Method publishMethod = findUniqueMethod("publishResource", cms.getClass().getDeclaredMethods());
+            Method publishMethod = cms.getClass().getDeclaredMethod("publishResource", String.class);
             publishMethod.invoke(cms, parentFolderName);
         }
     }
