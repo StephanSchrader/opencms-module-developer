@@ -188,9 +188,10 @@ public class CmsCompatibilityHelper {
 	        throw new RuntimeException("Cannot upgrade Runlevel of OpenCms", e);
 	    }
 	    
-	    Method upgradeMethod = findUniqueMethod("upgradeRunlevel", opencms.getClass().getDeclaredMethods());
 	    if (propertyContainer != null) {
     	    try {
+    	    	Method upgradeMethod = opencms.getClass().getDeclaredMethod("upgradeRunlevel", propertyContainer.getClass());
+    	    	upgradeMethod = makeAccessible(upgradeMethod);
                 upgradeMethod.invoke(opencms, propertyContainer);
             } catch (Exception e) {
                 throw new RuntimeException("Cannot upgrade Runlevel of OpenCms", e);
@@ -239,6 +240,10 @@ public class CmsCompatibilityHelper {
 				}
 			}
 		}
+		return makeAccessible(targetMethod);
+	}
+	
+	protected static Method makeAccessible(Method targetMethod) {
 		//Make sure we have access to the method
 		if (targetMethod != null) {
 	        if (!Modifier.isPublic(((Member)targetMethod).getModifiers()) || !Modifier.isPublic(((Member)targetMethod).getDeclaringClass().getModifiers())) {

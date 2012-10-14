@@ -1,5 +1,8 @@
 OpenCms Module Developer Eclipse plug-in
 
+Release 0.0.9 -- to be released
+- Fix bug when calling upgradeRunlevel on OpenCmsCore (issue 3568835 reported by Oleg Zinevich)
+
 Release 0.0.8 -- released on April 1, 2012 (no joke)
 - add support for OpenCms 8.0.2 (inspired by patch submitted by yangguang)
 - add OpenCms source file locations to preferences, so that you can jump to sources by 'Open Declaration' 
