@@ -1,0 +1,8 @@
+Features that are needed for better support of OpenCms development within the Eclipse environment
+- New OpenCms module: choose location where to create the project on the filesystem
+- Add helptext to the new module wizard
+- New OpenCms module: choose to add module to a working set
+- Optionally sync src folder to OpenCms (complementary to classes); in case someone doesn't use a version control system or wants to distribute the Java sources with the module
+- Get list of available content types from OpenCms and link them to files in the projects
+- Maintain properties on OpenCms files
+- Implement Eclipse editors for OpenCms content types
