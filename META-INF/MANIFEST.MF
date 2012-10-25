@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
-Bundle-SymbolicName: info.rsdev.eclipse.opencms.module.developer;singleton:=true
-Bundle-Version: 0.0.9
-Bundle-Activator: info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleDeveloperPlugin
+Bundle-SymbolicName: info.rsdev.eclipse.opencms;singleton:=true
+Bundle-Version: 0.2.0
+Bundle-Activator: info.rsdev.eclipse.opencms.OpenCmsModuleDeveloperPlugin
 Bundle-Vendor: %Bundle-Vendor.0
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -14,14 +14,14 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.launching,
  org.eclipse.jdt.core
 Eclipse-LazyStart: true
-Export-Package: info.rsdev.eclipse.opencms.module.developer,
- info.rsdev.eclipse.opencms.module.developer.actions,
- info.rsdev.eclipse.opencms.module.developer.compatibility,
- info.rsdev.eclipse.opencms.module.developer.data,
- info.rsdev.eclipse.opencms.module.developer.library,
- info.rsdev.eclipse.opencms.module.developer.loader,
- info.rsdev.eclipse.opencms.module.developer.loader.util,
- info.rsdev.eclipse.opencms.module.developer.preferences,
- info.rsdev.eclipse.opencms.module.developer.preferences.actions,
- info.rsdev.eclipse.opencms.module.developer.wizards,
+Export-Package: info.rsdev.eclipse.opencms,
+ info.rsdev.eclipse.opencms.actions,
+ info.rsdev.eclipse.opencms.compatibility,
+ info.rsdev.eclipse.opencms.data,
+ info.rsdev.eclipse.opencms.library,
+ info.rsdev.eclipse.opencms.loader,
+ info.rsdev.eclipse.opencms.loader.util,
+ info.rsdev.eclipse.opencms.preferences,
+ info.rsdev.eclipse.opencms.preferences.actions,
+ info.rsdev.eclipse.opencms.wizards,
  org.opencms.main

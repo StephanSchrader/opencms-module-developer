@@ -10,7 +10,7 @@
  */
 package org.opencms.main;
 
-import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
+import info.rsdev.eclipse.opencms.data.OpenCmsModuleDescriptor;
 
 import java.util.List;
 

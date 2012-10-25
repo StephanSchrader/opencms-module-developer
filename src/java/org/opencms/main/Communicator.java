@@ -10,13 +10,13 @@
  */
 package org.opencms.main;
 
-import info.rsdev.eclipse.opencms.module.developer.ExceptionUtils;
-import info.rsdev.eclipse.opencms.module.developer.Messages;
-import info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleDeveloperPlugin;
-import info.rsdev.eclipse.opencms.module.developer.compatibility.CmsCompatibilityHelper;
-import info.rsdev.eclipse.opencms.module.developer.data.OpenCmsModuleDescriptor;
-import info.rsdev.eclipse.opencms.module.developer.loader.OpenCmsClassLoader;
-import info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsModuleDeveloperPreferencePage;
+import info.rsdev.eclipse.opencms.ExceptionUtils;
+import info.rsdev.eclipse.opencms.Messages;
+import info.rsdev.eclipse.opencms.OpenCmsModuleDeveloperPlugin;
+import info.rsdev.eclipse.opencms.compatibility.CmsCompatibilityHelper;
+import info.rsdev.eclipse.opencms.data.OpenCmsModuleDescriptor;
+import info.rsdev.eclipse.opencms.loader.OpenCmsClassLoader;
+import info.rsdev.eclipse.opencms.preferences.OpenCmsModuleDeveloperPreferencePage;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
