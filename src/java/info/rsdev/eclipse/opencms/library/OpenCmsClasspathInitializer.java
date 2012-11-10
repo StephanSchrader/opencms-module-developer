@@ -27,7 +27,7 @@ import info.rsdev.eclipse.opencms.OpenCmsModuleDeveloperPlugin;
  */
 public class OpenCmsClasspathInitializer extends ClasspathContainerInitializer {
 	
-	public static final String ID = "info.rsdev.eclipse.opencms.module.developer.OpenCmsClasspath";
+	public static final String ID = "info.rsdev.eclipse.opencms.developer.OpenCmsClasspath";
 
 	private IClasspathContainer container;
 	

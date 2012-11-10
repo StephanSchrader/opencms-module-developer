@@ -28,7 +28,7 @@ public class AdditionalJarsChangedAction implements PreferenceChangedAction {
 	}
 
 	/* (non-Javadoc)
-	 * @see info.rsdev.eclipse.opencms.module.developer.actions.PreferenceChangedAction#execute(java.lang.String, java.lang.String)
+	 * @see info.rsdev.eclipse.opencms.developer.actions.PreferenceChangedAction#execute(java.lang.String, java.lang.String)
 	 */
 	public void execute(String oldValue, String newValue) {
 		List<String> oldFileNames = new ArrayList<String>();

@@ -7,21 +7,21 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsModuleDeveloperPreferencePage"
-            id="info.rsdev.eclipse.opencms.module.developer.MainPreferencesPage"
+            class="info.rsdev.eclipse.opencms.preferences.OpenCmsModuleDeveloperPreferencePage"
+            id="info.rsdev.eclipse.opencms.developer.MainPreferencesPage"
             name="%page.name.0"/>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
-            id="info.rsdev.eclipse.opencms.module.developer.actions.AddOpenCmsNatureAction"
+            id="info.rsdev.eclipse.opencms.developer.actions.AddOpenCmsNatureAction"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="info.rsdev.eclipse.opencms.module.developer.actions.ToggleOpenCmsNatureAction"
+               class="info.rsdev.eclipse.opencms.actions.ToggleOpenCmsNatureAction"
                enablesFor="+"
                icon="images/opencms16x16.png"
-               id="info.rsdev.eclipse.opencms.module.deployer.actions.AddOpenCmsNatureAction"
+               id="info.rsdev.eclipse.opencms.deployer.actions.AddOpenCmsNatureAction"
                label="%action.label.0"
                />
          <visibility>
@@ -32,81 +32,81 @@
                <not>
                   <objectState
                         name="nature"
-                        value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
+                        value="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNature"/>
                </not>
             </and>
          </visibility>
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="info.rsdev.eclipse.opencms.module.developer.actions.RemoveOpenCmsNature"
+            id="info.rsdev.eclipse.opencms.developer.actions.RemoveOpenCmsNature"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="info.rsdev.eclipse.opencms.module.developer.actions.ToggleOpenCmsNatureAction"
+               class="info.rsdev.eclipse.opencms.actions.ToggleOpenCmsNatureAction"
                enablesFor="+"
                icon="images/opencms16x16.png"
-               id="info.rsdev.eclipse.opencms.module.developer.actions.RemoveOpenCmsNatureAction"
+               id="info.rsdev.eclipse.opencms.developer.actions.RemoveOpenCmsNatureAction"
                label="%action.label.1"
                />
          <visibility>
            <objectState
               name="nature"
-              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
+              value="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNature"/>
          </visibility>
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="info.rsdev.eclipse.opencms.module.developer.actions.OpenCmsActionMenu"
+            id="info.rsdev.eclipse.opencms.developer.actions.OpenCmsActionMenu"
             objectClass="org.eclipse.core.resources.IResource">
          <menu
-               id="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu"
+               id="info.rsdev.eclipse.opencms.developer.actions.SubMenu"
                label="%menu.label.0"
                path="additions">
           <groupMarker name="content"/>
           <separator name="additions"/>
           <filter
               name="projectNature"
-              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
+              value="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNature"/>           
          </menu>
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="info.rsdev.eclipse.opencms.module.developer.actions.GetFromServerMenuItem"
+            id="info.rsdev.eclipse.opencms.developer.actions.GetFromServerMenuItem"
             objectClass="org.eclipse.core.resources.IResource">
           <filter
               name="projectNature"
-              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
+              value="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNature"/>           
          <action
-               class="info.rsdev.eclipse.opencms.module.developer.actions.GetFromServerAction"
-               id="info.rsdev.eclipse.opencms.module.developer.actions.GetFromServerAction"
+               class="info.rsdev.eclipse.opencms.actions.GetFromServerAction"
+               id="info.rsdev.eclipse.opencms.developer.actions.GetFromServerAction"
                label="Get from OpenCms server"
-               menubarPath="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu/content"/>
+               menubarPath="info.rsdev.eclipse.opencms.developer.actions.SubMenu/content"/>
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="info.rsdev.eclipse.opencms.module.developer.actions.UploadAndPublishMenuItem"
+            id="info.rsdev.eclipse.opencms.developer.actions.UploadAndPublishMenuItem"
             objectClass="org.eclipse.core.resources.IResource">
           <filter
               name="projectNature"
-              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
+              value="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNature"/>           
          <action
-               class="info.rsdev.eclipse.opencms.module.developer.actions.UploadAndPublishAction"
-               id="info.rsdev.eclipse.opencms.module.developer.actions.UploadAndPublishAction"
+               class="info.rsdev.eclipse.opencms.actions.UploadAndPublishAction"
+               id="info.rsdev.eclipse.opencms.developer.actions.UploadAndPublishAction"
                label="Copy to OpenCms server and Publish"
-               menubarPath="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu/content"/>
+               menubarPath="info.rsdev.eclipse.opencms.developer.actions.SubMenu/content"/>
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="info.rsdev.eclipse.opencms.module.developer.actions.CopyToServerMenuItem"
+            id="info.rsdev.eclipse.opencms.developer.actions.CopyToServerMenuItem"
             objectClass="org.eclipse.core.resources.IResource">
           <filter
               name="projectNature"
-              value="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>           
+              value="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNature"/>           
          <action
-               class="info.rsdev.eclipse.opencms.module.developer.actions.CopyToServerAction"
-               id="info.rsdev.eclipse.opencms.module.developer.actions.CopyToServerAction"
+               class="info.rsdev.eclipse.opencms.actions.CopyToServerAction"
+               id="info.rsdev.eclipse.opencms.developer.actions.CopyToServerAction"
                label="Copy to OpenCms server"
-               menubarPath="info.rsdev.eclipse.opencms.module.developer.actions.SubMenu/content"/>
+               menubarPath="info.rsdev.eclipse.opencms.developer.actions.SubMenu/content"/>
       </objectContribution>
    </extension>
    <extension
@@ -114,31 +114,31 @@
          name="OpenCms Module"
          point="org.eclipse.core.resources.natures">
       <runtime>
-         <run class="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
+         <run class="info.rsdev.eclipse.opencms.OpenCmsModuleNature"/>
       </runtime>
    </extension>
    <extension
-         id="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"
+         id="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNature"
          name="OpenCmsModuleNature"
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
             icon="images/opencms8x8.gif"
-            id="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNatureIcon"
-            natureId="info.rsdev.eclipse.opencms.module.developer.OpenCmsModuleNature"/>
+            id="info.rsdev.eclipse.opencms.developer.OpenCmsModuleNatureIcon"
+            natureId="info.rsdev.eclipse.opencms.OpenCmsModuleNature"/>
    </extension>
    <extension
          point="org.eclipse.jdt.core.classpathContainerInitializer">
       <classpathContainerInitializer
-            class="info.rsdev.eclipse.opencms.module.developer.library.OpenCmsClasspathInitializer"
-            id="info.rsdev.eclipse.opencms.module.developer.OpenCmsClasspath"/>
+            class="info.rsdev.eclipse.opencms.library.OpenCmsClasspathInitializer"
+            id="info.rsdev.eclipse.opencms.developer.OpenCmsClasspath"/>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            class="info.rsdev.eclipse.opencms.module.developer.wizards.NewModuleWizard"
+            class="info.rsdev.eclipse.opencms.wizards.NewModuleWizard"
             hasPages="true"
             icon="images/opencms16x16.png"
-            id="info.rsdev.eclipse.opencms.module.developer.newmodulewizard"
+            id="info.rsdev.eclipse.opencms.developer.newmodulewizard"
             name="OpenCms Module"
             project="true"/>
    </extension>

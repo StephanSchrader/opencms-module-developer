@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="plugin_export" name="build">
 	<target name="plugin_export">
-		<pde.exportPlugins destination="f:\temp" exportSource="false" exportType="zip" filename="OpenCmsModuleDeployer_0.0.3.zip" plugins="info.rsdev.eclipse.opencms.module.developer" useJARFormat="true"/>
+		<pde.exportPlugins destination="f:\temp" exportSource="false" exportType="zip" filename="OpenCmsModuleDeployer_0.0.3.zip" plugins="info.rsdev.eclipse.opencms.developer" useJARFormat="true"/>
 	</target>
 </project>

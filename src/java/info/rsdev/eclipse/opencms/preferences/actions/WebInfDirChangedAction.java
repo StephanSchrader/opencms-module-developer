@@ -38,7 +38,7 @@ public class WebInfDirChangedAction implements PreferenceChangedAction {
 	}
 
 	/* (non-Javadoc)
-	 * @see info.rsdev.eclipse.opencms.module.developer.actions.PreferenceChangedAction#execute(java.lang.String, java.lang.String)
+	 * @see info.rsdev.eclipse.opencms.developer.actions.PreferenceChangedAction#execute(java.lang.String, java.lang.String)
 	 */
 	public void execute(String oldValue, String newValue) {
 		updateClassLoader(oldValue, newValue);

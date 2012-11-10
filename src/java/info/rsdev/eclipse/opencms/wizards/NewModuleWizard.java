@@ -47,7 +47,7 @@ import org.opencms.main.ICommunicator;
  */
 public class NewModuleWizard extends Wizard implements INewWizard {
 
-	public static final String WIZARD_ID = "info.rsdev.eclipse.opencms.module.developer.newmodulewizard";
+	public static final String WIZARD_ID = "info.rsdev.eclipse.opencms.developer.newmodulewizard";
 
 	@SuppressWarnings("unused")
     private IStructuredSelection initialSelection = null;

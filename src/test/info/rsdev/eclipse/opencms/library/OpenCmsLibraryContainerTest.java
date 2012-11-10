@@ -1,9 +1,12 @@
-package info.rsdev.eclipse.opencms.module.developer.library;
+package info.rsdev.eclipse.opencms.library;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
 
-public class OpenCmsLibraryContainerTest extends TestCase {
+import org.junit.Test;
 
+public class OpenCmsLibraryContainerTest  {
+
+	@Test
 	public void testOpenCmsLibraryContainer() {
 		fail("Not yet implemented");
 	}

@@ -23,7 +23,7 @@ import org.osgi.framework.BundleContext;
 public class OpenCmsModuleDeveloperPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "info.rsdev.eclipse.opencms.module.developer";
+	public static final String PLUGIN_ID = "info.rsdev.eclipse.opencms.developer";
 
 	// The shared instance
 	private static OpenCmsModuleDeveloperPlugin plugin;

@@ -33,25 +33,25 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 public class OpenCmsModuleDeveloperPreferencePage extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage {
 	
-	public static final String OPENCMS_WEBINF_DIR = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsWebInfDir"; //$NON-NLS-1$
+	public static final String OPENCMS_WEBINF_DIR = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsWebInfDir"; //$NON-NLS-1$
 
-	public static final String OPENCMS_SRC_DIR = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsSrcDir"; //$NON-NLS-1$
+	public static final String OPENCMS_SRC_DIR = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsSrcDir"; //$NON-NLS-1$
 	
-	public static final String OPENCMS_ADDITIONAL_JARS = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsAdditionalJars";
+	public static final String OPENCMS_ADDITIONAL_JARS = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsAdditionalJars";
 	
-	public static final String OPENCMS_KEEP_ALIVE = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsKeepAlive";
+	public static final String OPENCMS_KEEP_ALIVE = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsKeepAlive";
 	
-	public static final String OPENCMS_MAKE_LIBRARY = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsMakeLibrary";
+	public static final String OPENCMS_MAKE_LIBRARY = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsMakeLibrary";
 	
-	public static final String OPENCMS_SERVLET_MAPPING = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsServletMapping";
+	public static final String OPENCMS_SERVLET_MAPPING = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsServletMapping";
 	
-	public static final String OPENCMS_WEBAPP_NAME = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsWebappName";
+	public static final String OPENCMS_WEBAPP_NAME = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsWebappName";
 	
-	public static final String OPENCMS_PROJECT_NAME = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsProjectName";
+	public static final String OPENCMS_PROJECT_NAME = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsProjectName";
 
-	public static final String OPENCMS_USERNAME = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsUserName"; //$NON-NLS-1$
+	public static final String OPENCMS_USERNAME = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsUserName"; //$NON-NLS-1$
 	
-	public static final String OPENCMS_PASSWORD = "info.rsdev.eclipse.opencms.module.developer.preferences.OpenCmsPassword"; //$NON-NLS-1$
+	public static final String OPENCMS_PASSWORD = "info.rsdev.eclipse.opencms.developer.preferences.OpenCmsPassword"; //$NON-NLS-1$
 	
 	private ScopedPreferenceStore preferences;
 	
