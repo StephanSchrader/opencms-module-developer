@@ -24,14 +24,13 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * @author Dave Schoorl
  *
  */
-@SuppressWarnings("deprecation")
 public class CommunicatorUtils {
 	
 	private CommunicatorUtils() {}
@@ -57,16 +56,16 @@ public class CommunicatorUtils {
 	}
 	
     public static boolean isProperlyConfigured() throws CoreException {
-		Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
-		boolean isProperlyConfigured = true;
+		IPreferenceStore	preferenceStore			= OpenCmsModuleDeveloperPlugin.getInstance().getPreferenceStore();
+		boolean				isProperlyConfigured	= true;
 		
 		//The following preferences must have values in order to start OpenCms
 		List<String> mandatoryPreferences = new ArrayList<String>();
-		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR));
-		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBAPP_NAME));
-		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SERVLET_MAPPING));
-		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_USERNAME));
-		mandatoryPreferences.add(preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_PASSWORD));
+		mandatoryPreferences.add(preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR));
+		mandatoryPreferences.add(preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBAPP_NAME));
+		mandatoryPreferences.add(preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SERVLET_MAPPING));
+		mandatoryPreferences.add(preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_USERNAME));
+		mandatoryPreferences.add(preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_PASSWORD));
 		
 		Iterator<String> preferencesIterator = mandatoryPreferences.iterator();
 		while (preferencesIterator.hasNext() && isProperlyConfigured) {
@@ -87,8 +86,9 @@ public class CommunicatorUtils {
 	
     public static void close(ICommunicator communicator, boolean forceClose) {
 		if (communicator != null) {
-			Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
-			boolean keepAlive = preferences.getBoolean(OpenCmsModuleDeveloperPreferencePage.OPENCMS_KEEP_ALIVE);
+			IPreferenceStore	preferenceStore	= OpenCmsModuleDeveloperPlugin.getInstance().getPreferenceStore();
+			boolean				keepAlive		= preferenceStore.getBoolean(OpenCmsModuleDeveloperPreferencePage.OPENCMS_KEEP_ALIVE);
+			
 			if (forceClose || !keepAlive) {
 				communicator.close();
 			}

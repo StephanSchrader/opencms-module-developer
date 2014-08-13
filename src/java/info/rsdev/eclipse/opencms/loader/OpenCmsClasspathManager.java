@@ -31,7 +31,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * This class is responsible for managing the OpenCms classpath. It is a helper class 
@@ -45,7 +45,6 @@ import org.eclipse.core.runtime.Preferences;
  * 
  * @author Dave Schoorl
  */
-@SuppressWarnings("deprecation")
 public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 {
 	private static final OpenCmsClasspathManager instance = new OpenCmsClasspathManager();
@@ -62,15 +61,15 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 	private File previousFileUsed = null;
 	
 	private OpenCmsClasspathManager() {
-		Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
+		IPreferenceStore preferenceStore = OpenCmsModuleDeveloperPlugin.getInstance().getPreferenceStore();
 		
 		//Make all jar and zipfiles from the configured OpenCms classpath available to the OpenCmsClasspathManager
-		String openCmsWebInfLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
+		String openCmsWebInfLocation = preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
 		this.changeWebInfLocation(null, openCmsWebInfLocation);
 		
 		//Make all additionally configured Jar-entries from the preferences available to the OpenCmsClasspathManager
 		List<File> classpathEntries = new ArrayList<File>();
-		String additionalEntries = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_ADDITIONAL_JARS);
+		String additionalEntries = preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_ADDITIONAL_JARS);
 		if ((additionalEntries != null) && (additionalEntries.length() > 0)) {
 			String[] entries = additionalEntries.split("\\?");
 			if ((entries != null) && (entries.length > 0)) {
@@ -189,8 +188,9 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 		URL resourceURL = null;
 		
 		if (isJarFile(file)) {
-			JarFile jarFile = new JarFile(file);
-			JarEntry jarEntry = jarFile.getJarEntry(resourceName);
+			JarFile		jarFile		= new JarFile(file);
+			JarEntry	jarEntry	= jarFile.getJarEntry(resourceName);
+			
 			if (jarEntry != null) {
 				//create an URL to the resource
 				try {
@@ -205,6 +205,8 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 				}
 				
 			}
+			
+			jarFile.close();
 		} else {
 			if (file.isDirectory()) {
 				File classFile = new File(file, resourceName);
@@ -283,8 +285,9 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 			
 			InputStream entryStream = null;
 			try {
-				JarFile jarFile = new JarFile(file);
-				JarEntry jarEntry = jarFile.getJarEntry(searchClassName);
+				JarFile		jarFile		= new JarFile(file);
+				JarEntry	jarEntry	= jarFile.getJarEntry(searchClassName);
+				
 				if (jarEntry != null) {
 					//read class bytes from jar file
 					entryStream = jarFile.getInputStream(jarEntry);
@@ -304,6 +307,8 @@ public class OpenCmsClasspathManager implements OpenCmsClasspathChangeListener
 					previousFileUsed = file;
 					result = new ClassMetaInformation(className, manifest, classBytes);
 				}
+				
+				jarFile.close();
 			} finally {
 				if (entryStream != null) {
 					entryStream.close();

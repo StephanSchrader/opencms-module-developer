@@ -26,24 +26,19 @@ import java.util.Vector;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * @author Dave Schoorl
  *
  */
-@SuppressWarnings("deprecation")
 public class OpenCmsLibraryContainer implements IClasspathContainer {
-	
 	public static final String CONTAINER_ID = "OpenCmsLibLocation";
-
 	private IPath containerPath = null;
-	
 	private File webinfLibLocation = null;
-
 	private File openCmsSourceLocation = null;
 	
 	@SuppressWarnings("unused")
@@ -54,16 +49,17 @@ public class OpenCmsLibraryContainer implements IClasspathContainer {
 	private IClasspathEntry[] classpath = null;
 
     public OpenCmsLibraryContainer(IPath containerPath) throws CoreException {
-		Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
-		String webinfLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
+		IPreferenceStore preferenceStore = OpenCmsModuleDeveloperPlugin.getInstance().getPreferenceStore();
+
+		String webinfLocation = preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
 		this.setWebInfLocation(webinfLocation);
 		
 		//also add additional jars to the Library container
-		String additionalJars = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_ADDITIONAL_JARS);
+		String additionalJars = preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_ADDITIONAL_JARS);
 		this.additionalJars = getFileEntries(additionalJars);
 
 		//also add additional jars to the Library container
-		String openCmsSourceLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SRC_DIR);
+		String openCmsSourceLocation = preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SRC_DIR);
 		this.setOpenCmsSourceLocation(openCmsSourceLocation);
 		
 		

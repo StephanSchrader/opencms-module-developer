@@ -37,8 +37,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.opencms.configuration.CmsSystemConfiguration;
 import org.opencms.file.CmsFile;
 import org.opencms.file.CmsFolder;
@@ -60,7 +60,6 @@ import org.opencms.util.CmsStringUtil;
  *
  * @author Dave Schoorl
  */
-@SuppressWarnings("deprecation")
 public class Communicator implements ICommunicator {
 	
 	private static final String PROJECT = "Offline";
@@ -86,13 +85,13 @@ public class Communicator implements ICommunicator {
 			progressMonitor.beginTask(Messages.task_start_opencms, 5000);
 		}
 		try {
-			Preferences preferences = OpenCmsModuleDeveloperPlugin.getDefault().getPluginPreferences();
-			String webinfLocation = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
-			String servletMapping = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SERVLET_MAPPING);
-			String webappName = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBAPP_NAME);
-			String userName = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_USERNAME);
-			String password = preferences.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_PASSWORD);
-			OpenCmsCore opencms = null;
+			IPreferenceStore	preferenceStore			= OpenCmsModuleDeveloperPlugin.getInstance().getPreferenceStore();
+			String				webinfLocation			= preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
+			String				servletMapping			= preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_SERVLET_MAPPING);
+			String				webappName				= preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBAPP_NAME);
+			String				userName				= preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_USERNAME);
+			String				password				= preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_PASSWORD);
+			OpenCmsCore			opencms					= null;
 			
 			try {
 				if (progressMonitor != null) {

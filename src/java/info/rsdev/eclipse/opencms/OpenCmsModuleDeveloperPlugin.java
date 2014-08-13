@@ -10,8 +10,6 @@
  */
 package info.rsdev.eclipse.opencms;
 
-import info.rsdev.eclipse.opencms.preferences.OpenCmsModuleDeveloperPreferencePage;
-
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -32,9 +30,17 @@ public class OpenCmsModuleDeveloperPlugin extends AbstractUIPlugin {
 	 * The constructor
 	 */
 	public OpenCmsModuleDeveloperPlugin() {
+		super();
+		
 		plugin = this;
 	}
 
+	
+	public static OpenCmsModuleDeveloperPlugin getInstance() {
+		return plugin;
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -57,18 +63,7 @@ public class OpenCmsModuleDeveloperPlugin extends AbstractUIPlugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static OpenCmsModuleDeveloperPlugin getDefault() {
+/*	public static OpenCmsModuleDeveloperPlugin getDefault() {
 		return plugin;
-	}
-
-	@SuppressWarnings("deprecation")
-    protected void initializeDefaultPluginPreferences() {
-		//TODO: use new (default) preferences mechanism
-		super.initializeDefaultPluginPreferences();
-		getPluginPreferences().setDefault(OpenCmsModuleDeveloperPreferencePage.OPENCMS_MAKE_LIBRARY, true);
-		getPluginPreferences().setDefault(OpenCmsModuleDeveloperPreferencePage.OPENCMS_KEEP_ALIVE, true);
-	}
-	
-	
-
+	}*/
 }

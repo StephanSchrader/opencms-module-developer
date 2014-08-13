@@ -58,7 +58,7 @@ public class ExceptionUtils {
 		}
 		
 		//show message of root exception log message to logfile
-		OpenCmsModuleDeveloperPlugin.getDefault().getLog().log(ce.getStatus());
+		OpenCmsModuleDeveloperPlugin.getInstance().getLog().log(ce.getStatus());
 		
 		return ce;
 	}

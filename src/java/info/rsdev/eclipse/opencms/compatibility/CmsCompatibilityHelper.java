@@ -10,12 +10,20 @@
  */
 package info.rsdev.eclipse.opencms.compatibility;
 
+import info.rsdev.eclipse.opencms.OpenCmsModuleDeveloperPlugin;
+import info.rsdev.eclipse.opencms.preferences.OpenCmsModuleDeveloperPreferencePage;
+
+import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLClassLoader;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.opencms.file.CmsObject;
 import org.opencms.file.CmsResource;
 import org.opencms.main.CmsSystemInfo;
@@ -27,7 +35,6 @@ import org.opencms.main.OpenCmsCore;
  * @author Dave Schoorl
  */
 public class CmsCompatibilityHelper {
-    
     private static ClassLoader opencmsClassloader = null;
 	
 	/**
@@ -170,8 +177,48 @@ public class CmsCompatibilityHelper {
 	 * @param cmsPropertyPath the path where the properties are located
 	 */
 	public static void upgradeRunlevel(OpenCmsCore opencms, String cmsPropertyPath) {
+		try {
+			IPreferenceStore	preferenceStore		= OpenCmsModuleDeveloperPlugin.getInstance().getPreferenceStore();
+			String				webinfLocation		= preferenceStore.getString(OpenCmsModuleDeveloperPreferencePage.OPENCMS_WEBINF_DIR);
+			ClassLoader			threadClassLoader	= Thread.currentThread().getContextClassLoader();
+			File				folder				= new File(webinfLocation+File.separator+"lib");
+			FilenameFilter		jarFilter			= new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					boolean accepted = false;
+					
+					if (name.toLowerCase().endsWith(".jar")) {
+						if (name.toLowerCase().contains("lucene")) {
+							accepted = true;
+						}
+						else if (name.toLowerCase().contains("jpa")) {
+							accepted = true;
+						}
+					}
+					
+					return accepted;
+				}
+			};
+			
+			File[]	listOfJarFiles	= folder.listFiles(jarFilter);
+			URL[]	jarUrls			= new URL[listOfJarFiles.length];
+					
+			for (int i=0; i < listOfJarFiles.length; i++) {
+				jarUrls[i] = listOfJarFiles[i].toURI().toURL();
+			}
+			
+			URLClassLoader urlClassLoader = new URLClassLoader(jarUrls, threadClassLoader);
+
+			Thread.currentThread().setContextClassLoader(urlClassLoader);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
 	    opencmsClassloader = Thread.currentThread().getContextClassLoader();
+	    
 	    Object propertyContainer = null;
+	    
 	    try {
     	    try {
     	        //the 8.0.2 and newer way
